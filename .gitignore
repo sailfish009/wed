@@ -38,6 +38,7 @@
 *.sdf
 *.exp
 *.ilk
+*.aps
 x64
 ipch
 *.suo

@@ -17,7 +17,8 @@ public:
 
 	BEGIN_MSG_MAP(CWedView)
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
-	END_MSG_MAP()
+    MESSAGE_HANDLER(WM_CHAR, OnChar)
+  END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
 //	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -32,4 +33,5 @@ public:
 
 		return 0;
 	}
+  LRESULT OnChar(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 };

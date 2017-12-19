@@ -28,6 +28,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
   case 8:   
   { 
+    if (array_c < 0) return 1;
     long tmp_char_w = array_w[--array_c];
     p.x -= tmp_char_w;
     RECT rect = { p.x, p.y, p.x + tmp_char_w, p.y + char_y }; 
@@ -37,6 +38,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
 
   default:  
   {
+    if (array_c < 0) array_c = 0;
     m_hdc = GetDC();
     GetCharWidth32(m_hdc, (UINT)wParam, (UINT)wParam, &char_w);
     CClientDC pDC(m_hWnd);
@@ -46,6 +48,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   }
     break;
   }
+  printf("%d\n", array_c);
   return 0;
 }
 

@@ -19,6 +19,8 @@ public:
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
     MESSAGE_HANDLER(WM_CHAR, OnChar)
     MESSAGE_HANDLER(WM_CREATE, OnCreate)
+    MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
+    MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
   END_MSG_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
@@ -30,5 +32,7 @@ public:
   TEXTMETRIC m_tm;
   LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnChar(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+  LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+  LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 };

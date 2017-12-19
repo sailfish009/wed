@@ -4,8 +4,10 @@
 
 static POINT p = { 0 };
 static int char_w = 0;
-static DWORD char_x;
-static DWORD char_y;
+static long char_x;
+static long char_y;
+static long array_c = 0;
+static int array_w[1024] = { 0 };
 
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -26,8 +28,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
   case 8:   
   { 
-    p.x -= char_w; 
-    RECT rect = { p.x, p.y, p.x + char_x, p.y + char_y }; 
+    long tmp_char_w = array_w[--array_c];
+    p.x -= tmp_char_w;
+    RECT rect = { p.x, p.y, p.x + tmp_char_w, p.y + char_y }; 
     InvalidateRect(&rect); 
   }  
   break;
@@ -39,7 +42,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     CClientDC pDC(m_hWnd);
     pDC.TextOut(p.x, p.y, (LPCTSTR)&wParam);
     ReleaseDC(m_hdc);
-    p.x += char_w;
+    p.x += array_w[array_c++] = char_w;
   }
     break;
   }

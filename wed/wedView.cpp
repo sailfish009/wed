@@ -10,6 +10,8 @@ static long char_x;
 static long char_y;
 static POINT p = { 0 };     //current position
 
+static BOOL line_changed = 0;
+
 typedef struct
 {
   long x;                              // character x position
@@ -43,15 +45,22 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
 
+    printf("[line array 1: %d]\n", line_array.size());
     if ( (line_array.size() == 0)  || (line_array.size() < (p.y +1) ) )
     {
       line_array.push_back(line);
-      line.clear();
-      printf("line array: %d \n", line_array.size());
+      printf("[line array 2: %d]\n", line_array.size());
+    }
+
+    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    if (line_changed) 
+    { 
+      line_changed = 0; 
+      printf("[Y: %d][line: %d][line_array: %d]\n", p.y, line.size(), line_array.size());
+      it->swap(line); 
     }
 
     int count = 0;
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     std::list<CH>::iterator line_a = it->begin();
     std::list<CH>::iterator line_b = it->begin();
     int element_n = it->size() -1;
@@ -72,16 +81,16 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       std::advance(line_a, element_n);
       std::advance(line_b, element_n + 1);
       it->erase(line_a, line_b);
+      line = (*it);
     }
     else
     {
       line.clear();
-      line_array.clear();
+      line_array.erase(it);
       p.x = 0;
     }
 
-    printf("[%d][%d]\n", p.x, it->size() );
-
+    //printf("[%d]\n", p.x );
   }  
   break;
 
@@ -119,9 +128,10 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     CClientDC pDC(m_hWnd);
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
     line.push_back(ch);
+    line_changed = 1;
     p.x += char_w;
 
-    printf("[%d]\n", p.x);
+    //printf("[%d]\n", p.x);
   }
     break;
   }

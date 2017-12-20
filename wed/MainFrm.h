@@ -16,7 +16,7 @@
 #include "wedView.h"
 ///////////////////////////////////////////////////////////////////////////////
 
-#define HIDE_MEMU    1
+#define SHOW_MENU   0
 
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
@@ -71,7 +71,7 @@ public:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
 		// create command bar window
-#if HIDE_MENU
+#if SHOW_MENU
 		HWND hWndCmdBar = m_CmdBar.Create(m_hWnd, rcDefault, NULL, ATL_SIMPLE_CMDBAR_PANE_STYLE);
 		// attach menu
 		m_CmdBar.AttachMenu(GetMenu());
@@ -81,7 +81,7 @@ public:
 		// remove old menu
 		SetMenu(NULL);
 
-#if HIDE_MENU
+#if SHOW_MENU
 		HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
 
 		CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
@@ -93,7 +93,7 @@ public:
 
 		m_hWndClient = m_view.Create(m_hWnd, rcDefault, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
 
-#if HIDE_MENU
+#if SHOW_MENU
 		UIAddToolBar(hWndToolBar);
 #endif
 		UISetCheck(ID_VIEW_TOOLBAR, 1);

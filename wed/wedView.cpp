@@ -5,7 +5,6 @@
 
 static int line_n = 0;
 static int char_w = 0;
-//static long count_x[2048] = { 0 };
 static long char_x;
 static long char_y;
 static POINT p = { 0 };     //current position
@@ -45,18 +44,15 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
 
-    printf("[line array 1: %d]\n", line_array.size());
     if ( (line_array.size() == 0)  || (line_array.size() < (p.y +1) ) )
     {
       line_array.push_back(line);
-      printf("[line array 2: %d]\n", line_array.size());
     }
 
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) 
     { 
       line_changed = 0; 
-      printf("[Y: %d][line: %d][line_array: %d]\n", p.y, line.size(), line_array.size());
       it->swap(line); 
     }
 
@@ -90,7 +86,6 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       p.x = 0;
     }
 
-    //printf("[%d]\n", p.x );
   }  
   break;
 
@@ -104,11 +99,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       line_array.push_back(line);
       line_n = p.y;
       line.clear();
-      printf("line_array: %d\n", line_array.size());
     }
     else
     {
-
     }
   }  
   break;
@@ -130,8 +123,6 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     line.push_back(ch);
     line_changed = 1;
     p.x += char_w;
-
-    //printf("[%d]\n", p.x);
   }
     break;
   }

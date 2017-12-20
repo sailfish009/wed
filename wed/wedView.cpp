@@ -5,7 +5,7 @@
 
 static int line_n = 0;
 static int char_w = 0;
-static long count_x[2048] = { 0 };
+//static long count_x[2048] = { 0 };
 static long char_x;
 static long char_y;
 static POINT p = { 0 };     //current position
@@ -29,9 +29,7 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   ReleaseDC(m_hdc);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
-
   CreateCaret((HBITMAP)1);
-  printf("x: %d  y: %d\n", char_x, char_y);
   return 0;
 }
 
@@ -43,20 +41,23 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     // backspace
   case 0x08:   
   {
-    if (count_x[p.y] < 1) return 1;
-    --count_x[p.y];
+    if (p.x < 1) return 1;
 
     if ( (line_array.size() == 0)  || (line_array.size() < (p.y +1) ) )
     {
       line_array.push_back(line);
       line.clear();
+      printf("line array: %d \n", line_array.size());
     }
 
     int count = 0;
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    std::list<CH>::iterator line_a = it->begin();
+    std::list<CH>::iterator line_b = it->begin();
+    int element_n = it->size() -1;
     for (auto i = it->begin(); i != it->end(); i++)
     {
-      if (count >= count_x[p.y])
+      if (count >= element_n)
       {
         CH ch = (*i);
         p.x -= ch.w;
@@ -66,12 +67,10 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       ++count;
     }
 
-    if (count_x[p.y])
+    if (p.x > 0)
     {
-      std::list<CH>::iterator line_a = it->begin();
-      std::list<CH>::iterator line_b = it->begin();
-      std::advance(line_a, count_x[p.y]);
-      std::advance(line_b, count_x[p.y] + 1);
+      std::advance(line_a, element_n);
+      std::advance(line_b, element_n + 1);
       it->erase(line_a, line_b);
     }
     else
@@ -81,7 +80,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       p.x = 0;
     }
 
-    printf("[%d]\n", p.x);
+    printf("[%d][%d]\n", p.x, it->size() );
 
   }  
   break;
@@ -115,13 +114,14 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     m_hdc = GetDC();
     GetCharWidth32(m_hdc, (UINT)wParam, (UINT)wParam, &char_w);
-    ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     ReleaseDC(m_hdc);
+    ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     CClientDC pDC(m_hWnd);
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
     line.push_back(ch);
     p.x += char_w;
-    ++count_x[p.y];
+
+    printf("[%d]\n", p.x);
   }
     break;
   }
@@ -133,23 +133,36 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
   switch (wParam)
   {
   case VK_LEFT:       
+  {
     if (p.x == 0)              return 1;
-    p.x -= 1;
+    int char_w = 0;
+    for (auto i = line.begin(); i != line.end(); i++)
+      if (p.x == (*i).x) { char_w = (*i).w; break; }
+    p.x -= char_w;
+  }
     break;
 
   case VK_RIGHT:    
-    if (p.x == count_x[p.y]) return 1;
-    p.x += 1;
+  {
+    int char_w = 0;
+    for (auto i = line.begin(); i != line.end(); i++)
+      if (p.x == (*i).x) { char_w = (*i).w; break; }
+    p.x += char_w;
+  }
     break;
 
   case VK_UP:
+  {
     if (p.y == 0)              return 1;
     p.y -= 1;
+  }
     break;
 
   case VK_DOWN:
+  {
     if (p.y == line_n)    return 1;
     p.y += 1;
+  }
     break;
   }
   return 0;

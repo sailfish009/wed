@@ -5,7 +5,7 @@
 
 static int line_n = 0;
 static int char_w = 0;
-static long count_x =0;
+static long count_x[2048] = { 0 };
 static long char_x;
 static long char_y;
 static POINT p = { 0 };     //current position
@@ -43,34 +43,35 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     // backspace
   case 0x08:   
   {
-    if (count_x < 1) return 1;
-    --count_x;
+    if (count_x[p.y] < 1) return 1;
+    --count_x[p.y];
 
-    if (line_array.size() == 0)
+    if ( (line_array.size() == 0)  || (line_array.size() < (p.y +1) ) )
     {
       line_array.push_back(line);
+      line.clear();
     }
 
     int count = 0;
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     for (auto i = it->begin(); i != it->end(); i++)
     {
-      if (count >= count_x)
+      if (count >= count_x[p.y])
       {
         CH ch = (*i);
+        p.x -= ch.w;
         RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };
         InvalidateRect(&rect);
       }
       ++count;
     }
 
-    if (count_x)
+    if (count_x[p.y])
     {
       std::list<CH>::iterator line_a = it->begin();
       std::list<CH>::iterator line_b = it->begin();
-      p.x -= (*line_a).w;
-      std::advance(line_a, count_x);
-      std::advance(line_b, count_x + 1);
+      std::advance(line_a, count_x[p.y]);
+      std::advance(line_b, count_x[p.y] + 1);
       it->erase(line_a, line_b);
     }
     else
@@ -79,6 +80,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       line_array.clear();
       p.x = 0;
     }
+
+    printf("[%d]\n", p.x);
 
   }  
   break;
@@ -93,6 +96,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       line_array.push_back(line);
       line_n = p.y;
       line.clear();
+      printf("line_array: %d\n", line_array.size());
     }
     else
     {
@@ -117,7 +121,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
     line.push_back(ch);
     p.x += char_w;
-    ++count_x;
+    ++count_x[p.y];
   }
     break;
   }
@@ -134,7 +138,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
     break;
 
   case VK_RIGHT:    
-    if (p.x == count_x) return 1;
+    if (p.x == count_x[p.y]) return 1;
     p.x += 1;
     break;
 

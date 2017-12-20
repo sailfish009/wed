@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "wedView.h"
-#include "MainFrm.h"
 
 static bool b_console = false;
 static HWND console_hwnd = nullptr;
@@ -39,7 +38,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       hdc = ::GetDC(console_hwnd);
       GetCharWidth32(hdc, (UINT)wParam, (UINT)wParam, &c_char_w);
       ::ReleaseDC(console_hwnd, hdc);
-      CH ch = { x, 0,  wParam, c_char_w };
+      CH ch = { x, 0,  (UINT8)wParam, (UINT8)c_char_w };
       cline.push_back(ch);
       CClientDC pDC(console_hwnd);
       pDC.TextOut(x, 0, (LPCTSTR)&wParam);

@@ -17,16 +17,16 @@ struct
 class CWedView : public CWindowImpl<CWedView>
 {
 public:
-	DECLARE_WND_CLASS(NULL)
+  DECLARE_WND_CLASS(NULL)
 
-	BOOL PreTranslateMessage(MSG* pMsg)
-	{
-		pMsg;
-		return FALSE;
-	}
+  BOOL PreTranslateMessage(MSG* pMsg)
+  {
+    pMsg;
+    return FALSE;
+  }
 
-	BEGIN_MSG_MAP(CWedView)
-		MESSAGE_HANDLER(WM_PAINT, OnPaint)
+  BEGIN_MSG_MAP(CWedView)
+    MESSAGE_HANDLER(WM_PAINT, OnPaint)
     MESSAGE_HANDLER(WM_CHAR, OnChar)
     MESSAGE_HANDLER(WM_CREATE, OnCreate)
     MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)

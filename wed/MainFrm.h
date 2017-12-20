@@ -18,6 +18,8 @@
 
 #define SHOW_MENU   0
 
+#include <string>
+
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
 	public CUpdateUI<CMainFrame>,
@@ -66,7 +68,7 @@ public:
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
   void write();
-
+  void SetStatusText(std::wstring strText);
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
@@ -90,7 +92,6 @@ public:
 #endif
 
 		CreateSimpleStatusBar();
-
 		m_hWndClient = m_view.Create(m_hWnd, rcDefault, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
 
 #if SHOW_MENU
@@ -108,7 +109,6 @@ public:
     // IMPLEMENTATION
     MoveWindow(0, 0, 640, 480);
     CenterWindow();
-
 
 		return 0;
 	}

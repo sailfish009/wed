@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "wedView.h"
-#include <list>
-#include <memory>
 
 static int line_n = 0;
 static int char_w = 0;
@@ -11,14 +9,6 @@ static POINT p = { 0 };                                                         
 
 static BOOL line_changed = 0;
 static BOOL wed_mode = 0;                                                        // 0: edit mode,  1: save mode
-
-typedef struct
-{
-  long x;                                                                                                // character x position
-  long y;                                                                                                // character y position
-  UINT8 c;                                                                                            // character content
-  UINT8 w;                                                                                           // character width
-} CH ;
 
 CH ch = { 0 };
 std::list<CH> line;
@@ -76,9 +66,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
 
     switch (wed_mode)
     {
-    case 0:break;
-    default:
-      break;
+    case 0:    hide_console();    break;
+    default:  show_console();   break;
     }
 
   }  

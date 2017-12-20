@@ -3,6 +3,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include <list>
+
+using CH =
+struct
+{
+  long x;                        // character x position
+  long y;                        // character y position
+  UINT8 c;                    // character content
+  UINT8 w;                   // character width
+};
 
 class CWedView : public CWindowImpl<CWedView>
 {
@@ -27,6 +37,9 @@ public:
 //	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 //	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+
+  LRESULT show_console();
+  static void hide_console();
 
   HDC m_hdc;
   TEXTMETRIC m_tm;

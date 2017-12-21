@@ -20,6 +20,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   case WM_CHAR:
     switch (wParam) 
     { 
+      // Backspace
+    case 0x08:  
+      {
+        if (x < 1) return 1;
+        auto i = cline.end(); --i;
+        CH ch = (*i); x -= ch.w;  RECT rect = { ch.x, 0, ch.x + ch.w, 24 };  ::InvalidateRect(console_hwnd, &rect, TRUE);
+        cline.pop_back();
+      }
+      break; 
+
       // ESC
     case 0x1B: CWedView::hide_console();  break; 
 

@@ -26,17 +26,17 @@ public:
   }
 
   BEGIN_MSG_MAP(CWedView)
-    MESSAGE_HANDLER(WM_PAINT, OnPaint)
-    MESSAGE_HANDLER(WM_CHAR, OnChar)
     MESSAGE_HANDLER(WM_CREATE, OnCreate)
+    MESSAGE_HANDLER(WM_CHAR, OnChar)
     MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
+    MESSAGE_HANDLER(WM_PAINT, OnPaint)
     MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
   END_MSG_MAP()
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+  //Handler prototypes (uncomment arguments if needed):
+  //LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+  //LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+  //LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
   LRESULT show_console();
   static void hide_console();

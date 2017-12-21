@@ -4,6 +4,7 @@
 
 #pragma once
 #include <list>
+#include <thread>
 
 using CH =
 struct
@@ -40,6 +41,11 @@ public:
 
   LRESULT show_console();
   static void hide_console();
+
+  std::thread file_worker;
+  void file_work(UINT8 mode, std::string &str, std::list<std::list<CH>> *ptr);
+  void write_file(const std::string &str, std::list<std::list<CH>> *ptr);
+  void read_file(const  std::string &str, std::list<std::list<CH>> *ptr);
 
   HDC m_hdc;
   TEXTMETRIC m_tm;

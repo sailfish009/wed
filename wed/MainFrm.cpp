@@ -2,11 +2,13 @@
 #include "MainFrm.h"
 #include <string>
 
+ CMainFrame *CMainFrame::this_ptr = nullptr;
+
 void CMainFrame::write()
 {
 }
 
-void CMainFrame::SetStatusText(std::wstring strText)
+void CMainFrame::SetStatusBar(std::wstring str)
 {
-  ::SetWindowText(m_hWndStatusBar, strText.c_str());
+  ::SetWindowText(m_hWndStatusBar, str.c_str());
 }

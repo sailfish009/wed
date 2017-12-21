@@ -28,6 +28,7 @@ class CMainFrame :
 public:
 	DECLARE_FRAME_WND_CLASS(NULL, IDR_MAINFRAME)
 
+  static CMainFrame *this_ptr;
 	CWedView m_view;
 	CCommandBarCtrl m_CmdBar;
 
@@ -68,7 +69,7 @@ public:
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
   void write();
-  void SetStatusText(std::wstring strText);
+  void SetStatusBar(std::wstring strText);
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
@@ -109,6 +110,7 @@ public:
     // IMPLEMENTATION
     MoveWindow(0, 0, 640, 480);
     CenterWindow();
+    this_ptr = this;
 
 		return 0;
 	}

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "wedView.h"
+#include "MainFrm.h"
 
 static int line_n = 0;
 static int char_w = 0;
@@ -55,7 +56,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
 
   // enter
   case 0x0D:   
-    p.x = 0,  p.y += 1;
+    p.x = 0;  p.y += 1;
     if (p.y > line_n) { line_array.push_back(line); line_n = p.y; line.clear(); }
     break;
 
@@ -63,11 +64,19 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   case 0x1B:   
   { 
     wed_mode = !wed_mode;
-
     switch (wed_mode)
     {
-    case 0:    hide_console();    break;
-    default:  show_console();   break;
+    // file read     // hide_console(); 
+    case 0:   break;       
+    // file write    // show_console(); 
+    default:  
+    {
+      if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
+      std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+      if (line_changed) { line_changed = 0; it->swap(line); }
+      std::string str = "sample.txt";  file_work(0, str, &line_array); 
+    }  
+      break;    
     }
 
   }  

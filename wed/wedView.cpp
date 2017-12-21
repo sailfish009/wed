@@ -117,22 +117,28 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
   case VK_LEFT:       
   {
     if (p.x == 0)  return 1;
+    HideCaret(); 
     int char_w = 0;
     for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
     p.x -= char_w;
+    SetCaretPos(p.x, p.y*char_y); 
+    ShowCaret(); 
   }
     break;
 
   case VK_RIGHT:    
   {
+    HideCaret(); 
     int char_w = 0;
     for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
     p.x += char_w;
+    SetCaretPos(p.x, p.y*char_y); 
+    ShowCaret(); 
   }
     break;
 
-  case VK_UP:         { if (p.y == 0) return 1;    p.y -= 1; }           break;
-  case VK_DOWN:  { if (p.y == line_n) return 1;  p.y += 1; }  break;
+  case VK_UP: { if (p.y == 0) return 1;  HideCaret();  p.y -= 1;  SetCaretPos(p.x, p.y*char_y); ShowCaret(); }   break;
+  case VK_DOWN:  { if (p.y == line_n) return 1; HideCaret();   p.y += 1; SetCaretPos(p.x, p.y*char_y); ShowCaret(); }  break;
   }
   return 0;
 }
@@ -152,7 +158,7 @@ LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
   ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
-  SetCaretPos(0, 0);
+  SetCaretPos(p.x, p.y*char_y);
   ShowCaret();
   return 0;
 }

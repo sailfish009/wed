@@ -1,14 +1,17 @@
 ﻿#include "stdafx.h"
 #include "wedView.h"
 #include "MainFrm.h"
+#include <atldlgs.h>
 #include <algorithm>
+
+BOOL filepath(char(&file_path)[256]);
 
 void CWedView::file_work(UINT8 mode, std::string &str, std::list<std::list<CH>> *ptr)
 {
   switch (mode)
   {
   case 0:   file_worker = std::thread([=] { write_file(str, ptr); }); file_worker.detach(); break;
-  default: file_worker = std::thread([=] { read_file(str, ptr); });  file_worker.detach();  break;
+  default: file_worker = std::thread([=] { read_file(ptr); });  file_worker.detach();  break;
   }
 }
 
@@ -30,10 +33,88 @@ void CWedView::write_file(const std::string &str, std::list<std::list<CH>> *ptr)
   CMainFrame::this_ptr->SetStatusBar(L"");
 }
 
-void CWedView::read_file(const std::string &str, std::list<std::list<CH>> *ptr)
+void CWedView::read_file(std::list<std::list<CH>> *ptr)
 {
-  FILE *file = nullptr;
-  fopen_s(&file, str.c_str(), "rb");
+  char file_path[256] = { 0 };
+  if (filepath(file_path))
+  {
+    size_t size = ptr->size();
+    switch(size)
+    {
+    case 0:break;
+    case 1:
+    {
+      std::list <std::list<CH>>::iterator it = std::next(ptr->begin(), 0);
+      for (auto i = it->begin(); i != it->end(); i++)
+      {
+        CH ch = (*i);
+        RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect);
+      }
+      ptr->clear();
+    }
+    break;
 
-  fclose(file);
+    default:
+    {
+      std::list <std::list<CH>>::iterator it_a = std::next(ptr->begin(), 0);
+      std::list <std::list<CH>>::iterator it_b = std::next(ptr->begin(), size-1);
+
+      auto i_a = it_a->begin();
+      auto i_b = it_b->end(); --i_b;
+      RECT rect = { (*i_a).x, (*i_a).y*char_y, (*i_b).x + (*i_b).w, (*i_b).y*char_y + char_y };  InvalidateRect(&rect);
+      ptr->clear();
+    }
+      break;
+    }
+    
+    p.x = p.y = 0;
+
+    UINT8 buffer[512] = { 0 };
+    FILE *file = nullptr;
+    fopen_s(&file, file_path, "rb");
+
+    m_hdc = GetDC();
+    CClientDC pDC(m_hWnd);
+    for(;;)
+    {
+      memset(buffer, 0, 512);
+      if (fgets((char *)buffer, 512, file))
+      {
+        buffer[strcspn((char*)buffer, "\r\n")] = 0;
+        line.clear();
+        p.x = 0;
+        for (int i = 0; i < 512; ++i)
+        {
+          WPARAM wp = buffer[i];
+          if (wp == 0) break;
+          GetCharWidth32(m_hdc, (UINT)wp, (UINT)wp, &char_w);
+          CH ch = { p.x,  p.y, buffer[i], (UINT8)char_w };
+          pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wp);
+          p.x += char_w&0xFF;
+          line.push_back(ch);
+        }
+        ptr->push_back(line);
+        p.y += 1;
+      }
+      else
+        break;
+    }
+    ReleaseDC(m_hdc);
+    fclose(file);
+  }
+}
+
+BOOL filepath(char(&file_path)[256])
+{
+  WCHAR filter[] = L"All Files(*.*)|*.*||";
+  CFileDialog fdlg(TRUE, L"*", L"*", OFN_HIDEREADONLY, filter);
+  if (IDOK == fdlg.DoModal())
+  {
+    std::wstring wstr = &fdlg.m_ofn.lpstrFile[0];
+    std::string str(wstr.begin(), wstr.end());
+    if (str.length() > 256)  return FALSE;
+    strncpy_s(file_path, str.c_str(), str.length());
+    return TRUE;
+  }
+  return FALSE;
 }

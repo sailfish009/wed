@@ -2,18 +2,14 @@
 #include "wedView.h"
 #include "MainFrm.h"
 
-static int line_n = 0;
-static int char_w = 0;
-static long char_x;
-static long char_y;
-static POINT p = { 0 };                                                                      //current position
-
-static BOOL line_changed = 0;
-static BOOL wed_mode = 0;                                                        // 0: edit mode,  1: save mode
-
 CH ch = { 0 };
-std::list<CH> line;
 std::list <std::list<CH>> line_array;
+
+POINT CWedView::p = { 0 };                                                          // current position
+int CWedView::line_n = 0;
+int CWedView::char_w = 0;
+BOOL CWedView::line_changed = 0;
+BOOL CWedView::wed_mode = 0;                                             // 0: edit mode,  1: save mode
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
@@ -22,7 +18,9 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   ReleaseDC(m_hdc);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
-  CreateCaret((HBITMAP)1);
+  CreateCaret((HBITMAP)0);
+  SetCaretPos(0, 0);
+  ShowCaret();
   return 0;
 }
 
@@ -67,7 +65,12 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     switch (wed_mode)
     {
     // file read     // hide_console(); 
-    case 0:   break;       
+    case 0:  
+    {
+      std::string str = "sample.txt"; file_work(1, str, &line_array);
+    }
+      break;       
+
     // file write    // show_console(); 
     default:  
     {

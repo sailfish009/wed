@@ -45,10 +45,20 @@ public:
   std::thread file_worker;
   void file_work(UINT8 mode, std::string &str, std::list<std::list<CH>> *ptr);
   void write_file(const std::string &str, std::list<std::list<CH>> *ptr);
-  void read_file(const  std::string &str, std::list<std::list<CH>> *ptr);
+  void read_file(std::list<std::list<CH>> *ptr);
 
   HDC m_hdc;
   TEXTMETRIC m_tm;
+  long char_x;
+  long char_y;
+  std::list<CH> line;
+
+  static POINT p;                                                                // current position
+  static int line_n;
+  static int char_w;
+  static BOOL line_changed;
+  static BOOL wed_mode;                                             // 0: edit mode,  1: save mode
+
   LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnChar(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

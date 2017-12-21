@@ -84,6 +84,10 @@ public:
 		// remove old menu
 		SetMenu(NULL);
 
+    // disable window resize
+    ModifyStyle(WS_THICKFRAME, 0);
+    ModifyStyle(WS_MAXIMIZEBOX, 0);
+
 #if SHOW_MENU
 		HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
 

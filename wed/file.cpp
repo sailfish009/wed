@@ -89,6 +89,8 @@ void CWedView::read_file(std::list<std::list<CH>> *ptr)
           if (wp == 0) break;
           GetCharWidth32(m_hdc, (UINT)wp, (UINT)wp, &char_w);
           CH ch = { p.x,  p.y, buffer[i], (UINT8)char_w };
+          pDC.SetTextColor(FONTCOLOR);
+          pDC.SetBkColor(BACKGROUND);
           pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wp);
           p.x += char_w&0xFF;
           line.push_back(ch);

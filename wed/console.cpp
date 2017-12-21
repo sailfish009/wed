@@ -51,6 +51,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       CH ch = { x, 0,  (UINT8)wParam, (UINT8)c_char_w };
       cline.push_back(ch);
       CClientDC pDC(console_hwnd);
+      pDC.SetTextColor(FONTCOLOR);
+      pDC.SetBkColor(BACKGROUND);
       pDC.TextOut(x, 0, (LPCTSTR)&wParam);
       x += c_char_w;
     }

@@ -70,26 +70,16 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   case 0x1B:   
   { 
     wed_mode = !wed_mode;
+
+    if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
+    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+
     switch (wed_mode)
     {
-    // file read     // hide_console(); 
-    case 0:  
-    {
-      std::string str = "sample.txt"; file_work(1, str, &line_array);
+    case 0:  { std::string str = "sample.txt"; file_work(1, str, &line_array); }  break;       // file read     // hide_console(); 
+    default: { std::string str = "sample.txt";  file_work(0, str, &line_array); } break;    // file write    // show_console(); 
     }
-      break;       
-
-    // file write    // show_console(); 
-    default:  
-    {
-      if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-      std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
-      if (line_changed) { line_changed = 0; it->swap(line); }
-      std::string str = "sample.txt";  file_work(0, str, &line_array); 
-    }  
-      break;    
-    }
-
   }  
   break;
 

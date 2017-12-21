@@ -18,10 +18,12 @@ extern CAppModule _Module;
 
 #include <atlwin.h>
 
+#if 0
 #ifdef _UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") 
 #else
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
 #endif
 
 #if defined _M_IX86

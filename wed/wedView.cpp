@@ -15,6 +15,7 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 {
   m_hdc = GetDC();
   GetTextMetrics(m_hdc, &m_tm);
+  SetBkColor(m_hdc, RGB(255, 0, 0));
   ReleaseDC(m_hdc);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
@@ -30,6 +31,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   case 0x08:   
   {
     if (p.x < 1) return 1;
+    HideCaret();
 
     if ( (line_array.size() == 0)  || (line_array.size() < (size_t)(p.y +1) ) ) line_array.push_back(line);
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
@@ -46,6 +48,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     }
     if (p.x > 0) { std::advance(line_a, e_n); std::advance(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
     else { line.clear(); line_array.erase(it); p.x = 0; }
+    SetCaretPos(p.x, p.y*char_y);
+    ShowCaret();
   }  
   break;
 

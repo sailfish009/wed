@@ -6,6 +6,17 @@
 #include <list>
 #include <thread>
 
+#define RED_A  250
+#define GREEN_A 250
+#define BLUE_A 250
+#define FONTCOLOR  (RGB(RED_A,GREEN_A,BLUE_A))
+
+#define RED_B 0
+#define GREEN_B 0
+#define BLUE_B 0
+#define BACKGROUND  (RGB(RED_B,GREEN_B,BLUE_B))
+
+
 using CH =
 struct
 {

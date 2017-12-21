@@ -15,10 +15,14 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 {
   m_hdc = GetDC();
   GetTextMetrics(m_hdc, &m_tm);
-  SetBkColor(m_hdc, RGB(255, 0, 0));
+  SetBkColor(m_hdc, TRANSPARENT);
   ReleaseDC(m_hdc);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
+
+  HBRUSH brush  = CreateSolidBrush(BACKGROUND);
+  SetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND, (LONG)brush);
+
   return 0;
 }
 
@@ -97,6 +101,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     ReleaseDC(m_hdc);
     ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     CClientDC pDC(m_hWnd);
+    pDC.SetTextColor(FONTCOLOR);
+    pDC.SetBkColor(BACKGROUND);
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
     line.push_back(ch);
     line_changed = 1;
@@ -150,7 +156,6 @@ LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-  //CreateCaret((HBITMAP)0);
   ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
   SetCaretPos(0, 0);
   ShowCaret();

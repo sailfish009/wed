@@ -59,7 +59,7 @@ public:
   void write_file(const std::string &str, std::list<std::list<CH>> *ptr);
   void read_file(std::list<std::list<CH>> *ptr);
 
-  HDC m_hdc;
+  static HFONT m_font;
   TEXTMETRIC m_tm;
   long char_x;
   long char_y;

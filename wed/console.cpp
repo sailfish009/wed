@@ -7,7 +7,6 @@ static int c_char_w = 0;
 
 std::list<CH> cline;
 static long x = 0;
-HDC hdc;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -45,15 +44,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     default:
     {
-      hdc = ::GetDC(console_hwnd);
-      GetCharWidth32(hdc, (UINT)wParam, (UINT)wParam, &c_char_w);
-      ::ReleaseDC(console_hwnd, hdc);
-      CH ch = { x, 0,  (UINT8)wParam, (UINT8)c_char_w };
-      cline.push_back(ch);
       CClientDC pDC(console_hwnd);
+      pDC.SelectFont(CWedView::m_font);
+      pDC.GetCharWidth32((UINT)wParam, (UINT)wParam, &c_char_w);
       pDC.SetTextColor(FONTCOLOR);
       pDC.SetBkColor(BACKGROUND);
+      CH ch = { x, 0,  (UINT8)wParam, (UINT8)c_char_w };
       pDC.TextOut(x, 0, (LPCTSTR)&wParam);
+      cline.push_back(ch);
       x += c_char_w;
     }
       break;

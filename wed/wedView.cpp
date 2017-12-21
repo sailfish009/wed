@@ -10,18 +10,24 @@ int CWedView::line_n = 0;
 int CWedView::char_w = 0;
 BOOL CWedView::line_changed = 0;
 BOOL CWedView::wed_mode = 0;                                             // 0: edit mode,  1: save mode
+HFONT CWedView::m_font;
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-  m_hdc = GetDC();
-  GetTextMetrics(m_hdc, &m_tm);
-  SetBkColor(m_hdc, TRANSPARENT);
-  ReleaseDC(m_hdc);
-  char_x = m_tm.tmAveCharWidth;
-  char_y = m_tm.tmHeight;
-
   HBRUSH brush  = CreateSolidBrush(BACKGROUND);
   SetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND, (LONG)brush);
+
+  m_font = CreateFont(18, 0, 0, 0, FW_LIGHT, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,  DEFAULT_QUALITY, DEFAULT_PITCH, 
+    L"Dejavu Sans Mono");
+    //L"Source Sans Pro");
+
+  if (m_font) SetFont(m_font);
+
+  CClientDC pDC(m_hWnd);
+  pDC.SelectFont(m_font);
+  pDC.GetTextMetrics(&m_tm);
+  char_x = m_tm.tmAveCharWidth;
+  char_y = m_tm.tmHeight;
 
   return 0;
 }
@@ -86,13 +92,12 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   default:  
   {
     HideCaret();
-    m_hdc = GetDC();
-    GetCharWidth32(m_hdc, (UINT)wParam, (UINT)wParam, &char_w);
-    ReleaseDC(m_hdc);
-    ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     CClientDC pDC(m_hWnd);
+    pDC.SelectFont(m_font);
+    pDC.GetCharWidth32((UINT)wParam, (UINT)wParam, &char_w);
     pDC.SetTextColor(FONTCOLOR);
     pDC.SetBkColor(BACKGROUND);
+    ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
     line.push_back(ch);
     line_changed = 1;

@@ -18,9 +18,6 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   ReleaseDC(m_hdc);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
-  CreateCaret((HBITMAP)0);
-  SetCaretPos(0, 0);
-  ShowCaret();
   return 0;
 }
 
@@ -54,8 +51,11 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
 
   // enter
   case 0x0D:   
+    HideCaret();
     p.x = 0;  p.y += 1;
     if (p.y > line_n) { line_array.push_back(line); line_n = p.y; line.clear(); }
+    SetCaretPos(p.x, p.y*char_y);
+    ShowCaret();
     break;
 
   // ESC
@@ -87,6 +87,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
 
   default:  
   {
+    HideCaret();
     m_hdc = GetDC();
     GetCharWidth32(m_hdc, (UINT)wParam, (UINT)wParam, &char_w);
     ReleaseDC(m_hdc);
@@ -96,6 +97,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     line.push_back(ch);
     line_changed = 1;
     p.x += char_w;
+    SetCaretPos(p.x, p.y*char_y);
+    ShowCaret();
   }
     break;
   }
@@ -137,5 +140,15 @@ LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
 
 LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+  return 0;
+}
+
+
+LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+{
+  //CreateCaret((HBITMAP)0);
+  ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
+  SetCaretPos(0, 0);
+  ShowCaret();
   return 0;
 }

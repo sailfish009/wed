@@ -68,6 +68,44 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     HideCaret();
     p.x = 0;  p.y += 1;
     if (p.y > line_n) { line_array.push_back(line); line_n = p.y; line.clear(); }
+    else 
+    { 
+      std::list<CH> nline;  
+      size_t size = line_array.size();
+      for (size_t j = 0; j < size; ++j) 
+      {
+        if (j >= (size_t)p.y) 
+        { 
+          std::list<std::list<CH>>::iterator it = std::next(line_array.begin(), j);
+          for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
+        }
+      }
+      std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+      line_array.insert(it, nline);
+
+      size = line_array.size();
+      for (size_t j = 0; j < size; ++j)
+      {
+        if (j > (size_t)p.y)
+        {
+          p.x = 0;
+          for (auto i = it->begin(); i != it->end(); i++) 
+          { 
+            CH ch = (*i); 
+            CClientDC pDC(m_hWnd);
+            pDC.SelectFont(m_font);
+            pDC.SetTextColor(FONTCOLOR);
+            pDC.SetBkColor(BACKGROUND);
+            ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
+            pDC.TextOut(ch.x, ch.y*char_y, (LPCTSTR)&ch.c);
+            line.push_back(ch);
+            line_changed = 1;
+            p.x += ch.w;
+          }
+        }
+      }
+      p.x = 0;
+    }
     SetCaretPos(p.x, p.y*char_y);
     ShowCaret();
     break;
@@ -137,8 +175,31 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
   }
     break;
 
-  case VK_UP: { if (p.y == 0) return 1;  HideCaret();  p.y -= 1;  SetCaretPos(p.x, p.y*char_y); ShowCaret(); }   break;
-  case VK_DOWN:  { if (p.y == line_n) return 1; HideCaret();   p.y += 1; SetCaretPos(p.x, p.y*char_y); ShowCaret(); }  break;
+  case VK_UP:         
+  { 
+    if (p.y == 0)           return 1; 
+    HideCaret();  
+    if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
+    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+    p.y -= 1;  
+    SetCaretPos(p.x, p.y*char_y); 
+    ShowCaret(); 
+  }  
+  break;
+
+  case VK_DOWN:  
+  { 
+    if (p.y == line_n) return 1; 
+    HideCaret();  
+    if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
+    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+    p.y += 1; 
+    SetCaretPos(p.x, p.y*char_y); 
+    ShowCaret(); 
+  }  
+  break;
   }
   return 0;
 }
@@ -153,7 +214,6 @@ LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 {
   return 0;
 }
-
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {

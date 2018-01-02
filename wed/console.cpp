@@ -114,6 +114,7 @@ LRESULT CWedView::show_console()
   rect.top = rect.bottom + 1;
   rect.bottom = rect.top + 24;
   if (console_hwnd == nullptr)  console_hwnd = CreateConsoleWindow(m_hWnd, rect);
+  else ::MoveWindow(console_hwnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 
   if (b_console == false)
   {

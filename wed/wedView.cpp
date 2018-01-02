@@ -10,7 +10,7 @@ int CWedView::line_n = 0;
 int CWedView::char_w = 0;
 BOOL CWedView::line_changed = 0;
 BOOL CWedView::wed_mode = 0;                                             // 0: edit mode,  1: save mode
-HFONT CWedView::m_font;
+HFONT CWedView::m_font=nullptr;
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
@@ -20,7 +20,6 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   m_font = CreateFont(18, 0, 0, 0, FW_LIGHT, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,  DEFAULT_QUALITY, DEFAULT_PITCH, 
     L"Dejavu Sans Mono");
     //L"Source Sans Pro");
-
   if (m_font) SetFont(m_font);
 
   CClientDC pDC(m_hWnd);
@@ -28,13 +27,28 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   pDC.GetTextMetrics(&m_tm);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
-
   return 0;
 }
 
 LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-  //printf("0x%02x\n", wParam);
+  printf("0x%02x\n", wParam);
+  if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
+  {
+    //printf("control key pressed: %d\n", wParam);
+    if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
+    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+
+    switch (wParam)
+    {
+    case 0x0F: file_work(1, &line_array); break;   // file read              //'o' - 96
+    case 0x13: file_work(0, &line_array); break;   // file write             //'s' - 96
+    case 0x03: show_console();                  break;   // show console  //'c' - 96
+    }
+    return 1;
+  }
+
   switch (wParam)
   {
     // backspace
@@ -118,12 +132,6 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
-
-    switch (wed_mode)
-    {
-    case 0:  { std::string str = "sample.txt"; file_work(1, str, &line_array); }  break;       // file read     // hide_console(); 
-    default: { std::string str = "sample.txt";  file_work(0, str, &line_array); } break;    // file write    // show_console(); 
-    }
   }  
   break;
 
@@ -136,7 +144,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     pDC.SetTextColor(FONTCOLOR);
     pDC.SetBkColor(BACKGROUND);
     ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
-    pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam); 
+    pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
     line.push_back(ch);
     line_changed = 1;
     p.x += char_w;
@@ -148,7 +156,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   return 0;
 }
 
-LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
   switch (wParam)
   {
@@ -183,7 +191,12 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  
-    SetCaretPos(p.x, p.y*char_y); 
+    it = std::next(line_array.begin(), p.y);
+    std::list<CH>::iterator line_a = it->begin();
+    int e_n = it->size() - 1;
+    std::advance(line_a, e_n);
+    p.x = (*line_a).x + (*line_a).w;
+    SetCaretPos(p.x,  p.y*char_y); 
     ShowCaret(); 
   }  
   break;
@@ -204,6 +217,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
   return 0;
 }
 
+
 LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
   CPaintDC dc(m_hWnd);
@@ -222,3 +236,4 @@ LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
   ShowCaret();
   return 0;
 }
+

@@ -55,8 +55,8 @@ public:
   static void hide_console();
 
   std::thread file_worker;
-  void file_work(UINT8 mode, std::string &str, std::list<std::list<CH>> *ptr);
-  void write_file(const std::string &str, std::list<std::list<CH>> *ptr);
+  void file_work(UINT8 mode, std::list<std::list<CH>> *ptr);
+  void write_file(std::list<std::list<CH>> *ptr);
   void read_file(std::list<std::list<CH>> *ptr);
 
   static HFONT m_font;

@@ -18,7 +18,7 @@ extern CAppModule _Module;
 
 #include <atlwin.h>
 
-#if 0
+#if 1
 #ifdef _UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") 
 #else

@@ -32,7 +32,7 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 
 LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-  printf("0x%02x\n", wParam);
+  //printf("0x%02x\n", wParam);
   if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
   {
     //printf("control key pressed: %d\n", wParam);
@@ -56,15 +56,11 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-
-    if ( (line_array.size() == 0)  || (line_array.size() < (size_t)(p.y +1) ) ) line_array.push_back(line);
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
-    if (line_changed) { line_changed = 0; it->swap(line); }
-
-    int count = 0;
     std::list<CH>::iterator line_a = it->begin();
     std::list<CH>::iterator line_b = it->begin();
     int e_n = it->size() -1;
+    int count = 0;
     for (auto i = it->begin(); i != it->end(); i++)
     {
       if (count >= e_n) { CH ch = (*i); p.x -= ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect);  }
@@ -81,7 +77,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   case 0x0D:   
     HideCaret();
     p.x = 0;  p.y += 1;
-    if (p.y > line_n) { line_array.push_back(line); line_n = p.y; line.clear(); }
+    if (p.y > line_n) {line_array.push_back(line); line_n = p.y; line.clear(); }
     else 
     { 
       std::list<CH> nline;  
@@ -146,6 +142,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
     line.push_back(ch);
+    if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
+    else { std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y); (*it) = line; }
     line_changed = 1;
     p.x += char_w;
     SetCaretPos(p.x, p.y*char_y);

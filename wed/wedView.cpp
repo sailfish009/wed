@@ -193,9 +193,14 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     p.y -= 1;  
     it = std::next(line_array.begin(), p.y);
     std::list<CH>::iterator line_a = it->begin();
-    int e_n = it->size() - 1;
-    std::advance(line_a, e_n);
-    p.x = (*line_a).x + (*line_a).w;
+    int line_size = it->size();
+    if (line_size)
+    {
+      int e_n = line_size -1;
+      std::advance(line_a, e_n);
+      p.x = (*line_a).x + (*line_a).w;
+    }
+    else p.x = 0;
     SetCaretPos(p.x,  p.y*char_y); 
     ShowCaret(); 
   }  
@@ -209,6 +214,16 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y += 1; 
+    it = std::next(line_array.begin(), p.y);
+    std::list<CH>::iterator line_a = it->begin();
+    int line_size = it->size();
+    if (line_size)
+    {
+      int e_n = line_size - 1;
+      std::advance(line_a, e_n);
+      p.x = (*line_a).x + (*line_a).w;
+    }
+    else p.x = 0;
     SetCaretPos(p.x, p.y*char_y); 
     ShowCaret(); 
   }  

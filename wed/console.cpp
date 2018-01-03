@@ -5,7 +5,7 @@ static bool b_console = false;
 static HWND console_hwnd = nullptr;
 static int c_char_w = 0;
 
-std::list<CH> cline;
+cl cline;
 static long x = 0;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

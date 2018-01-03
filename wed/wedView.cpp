@@ -3,7 +3,7 @@
 #include "MainFrm.h"
 
 CH ch = { 0 };
-std::list <std::list<CH>> line_array;
+cla line_array;
 
 POINT CWedView::p = { 0 };                                                          // current position
 int CWedView::line_n = 0;
@@ -37,7 +37,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     //printf("control key pressed: %d\n", wParam);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    cla::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
 
     switch (wParam)
@@ -56,9 +56,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
-    std::list<CH>::iterator line_a = it->begin();
-    std::list<CH>::iterator line_b = it->begin();
+    cla::iterator it = std::next(line_array.begin(), p.y);
+    cl::iterator line_a = it->begin();
+    cl::iterator line_b = it->begin();
     int e_n = it->size() -1;
     int count = 0;
     for (auto i = it->begin(); i != it->end(); i++)
@@ -80,17 +80,17 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     if (p.y > line_n) {line_array.push_back(line); line_n = p.y; line.clear(); }
     else 
     { 
-      std::list<CH> nline;  
+      cl nline;  
       size_t size = line_array.size();
       for (size_t j = 0; j < size; ++j) 
       {
         if (j >= (size_t)p.y) 
         { 
-          std::list<std::list<CH>>::iterator it = std::next(line_array.begin(), j);
+          cla::iterator it = std::next(line_array.begin(), j);
           for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
         }
       }
-      std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+      cla::iterator it = std::next(line_array.begin(), p.y);
       line_array.insert(it, nline);
 
       size = line_array.size();
@@ -126,7 +126,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     wed_mode = !wed_mode;
 
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    cla::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
   }  
   break;
@@ -143,7 +143,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
     line.push_back(ch);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
-    else { std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y); (*it) = line; }
+    else { cla::iterator it = std::next(line_array.begin(), p.y); (*it) = line; }
     line_changed = 1;
     p.x += char_w;
     SetCaretPos(p.x, p.y*char_y);
@@ -186,11 +186,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == 0)           return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    cla::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  
     it = std::next(line_array.begin(), p.y);
-    std::list<CH>::iterator line_a = it->begin();
+    cl::iterator line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {
@@ -209,11 +209,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == line_n) return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    std::list <std::list<CH>>::iterator it = std::next(line_array.begin(), p.y);
+    cla::iterator it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y += 1; 
     it = std::next(line_array.begin(), p.y);
-    std::list<CH>::iterator line_a = it->begin();
+    cl::iterator line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {

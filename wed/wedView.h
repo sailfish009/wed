@@ -26,6 +26,9 @@ struct
   UINT8 w;                   // character width
 };
 
+using cl = std::list<CH>;                             // Character List
+using cla = std::list<std::list<CH>>;        // Character List Array
+
 class CWedView : public CWindowImpl<CWedView>
 {
 public:
@@ -55,15 +58,15 @@ public:
   static void hide_console();
 
   std::thread file_worker;
-  void file_work(UINT8 mode, std::list<std::list<CH>> *ptr);
-  void write_file(std::list<std::list<CH>> *ptr);
-  void read_file(std::list<std::list<CH>> *ptr);
+  void file_work(UINT8 mode, cla *ptr);
+  void write_file(cla *ptr);
+  void read_file(cla *ptr);
 
   static HFONT m_font;
   TEXTMETRIC m_tm;
   long char_x;
   long char_y;
-  std::list<CH> line;
+  cl line;
 
   static POINT p;                                                                // current position
   static int line_n;

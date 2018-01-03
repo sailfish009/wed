@@ -27,6 +27,7 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   pDC.GetTextMetrics(&m_tm);
   char_x = m_tm.tmAveCharWidth;
   char_y = m_tm.tmHeight;
+  ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
   return 0;
 }
 
@@ -248,7 +249,6 @@ LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-  ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
   SetCaretPos(p.x, p.y*char_y);
   ShowCaret();
   return 0;

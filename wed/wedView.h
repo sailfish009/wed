@@ -29,6 +29,9 @@ struct
 using cl = std::list<CH>;                             // Character List
 using cla = std::list<std::list<CH>>;        // Character List Array
 
+using lt = std::list<CH>::iterator;                             // List iterator
+using llt = std::list<std::list<CH>>::iterator;         // List List iterator
+
 class CWedView : public CWindowImpl<CWedView>
 {
 public:

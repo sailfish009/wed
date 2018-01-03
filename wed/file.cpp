@@ -26,8 +26,8 @@ void CWedView::write_file( cla *ptr)
     size_t line_size = ptr->size();
     for (size_t j = 0; j < line_size; ++j)
     {
-      cla::iterator it = std::next(ptr->begin(), j);
-      for (auto i = it->begin(); i != it->end(); ++i)  fwrite(&(*i).c, 1, 1, file);
+      llt it = std::next(ptr->begin(), j);
+      for (auto i = it->begin(); i != it->end(); ++i) if((*i).w) fwrite(&(*i).c, 1, 1, file);
       fprintf(file, "\r\n");
     }
     fclose(file);
@@ -49,7 +49,7 @@ void CWedView::read_file(cla *ptr)
     case 0:break;
     case 1:
     {
-      cla::iterator it = std::next(ptr->begin(), 0);
+      llt it = std::next(ptr->begin(), 0);
       for (auto i = it->begin(); i != it->end(); i++)
       {
         CH ch = (*i);
@@ -61,8 +61,8 @@ void CWedView::read_file(cla *ptr)
 
     default:
     {
-      cla::iterator it_a = std::next(ptr->begin(), 0);
-      cla::iterator it_b = std::next(ptr->begin(), size-1);
+      llt it_a = std::next(ptr->begin(), 0);
+      llt it_b = std::next(ptr->begin(), size-1);
 
       auto i_a = it_a->begin();
       auto i_b = it_b->end(); --i_b;

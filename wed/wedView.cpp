@@ -37,7 +37,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     //printf("control key pressed: %d\n", wParam);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    cla::iterator it = std::next(line_array.begin(), p.y);
+    llt it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
 
     switch (wParam)
@@ -56,9 +56,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-    cla::iterator it = std::next(line_array.begin(), p.y);
-    cl::iterator line_a = it->begin();
-    cl::iterator line_b = it->begin();
+    llt it = std::next(line_array.begin(), p.y);
+    lt line_a = it->begin();
+    lt line_b = it->begin();
     int e_n = it->size() -1;
     int count = 0;
     for (auto i = it->begin(); i != it->end(); i++)
@@ -77,7 +77,11 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   case 0x0D:   
     HideCaret();
     p.x = 0;  p.y += 1;
-    if (p.y > line_n) {line_array.push_back(line); line_n = p.y; line.clear(); }
+    if (p.y > line_n) 
+    {
+      if (line.size()) { line_array.push_back(line); line_n = p.y; line.clear();}
+      else { printf("size: %d\n", line.size());   ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.clear(); line.push_back(ch); line_array.push_back(line); printf("size: %d\n", line.size()); line.clear(); }
+    }
     else 
     { 
       cl nline;  
@@ -86,11 +90,11 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       {
         if (j >= (size_t)p.y) 
         { 
-          cla::iterator it = std::next(line_array.begin(), j);
+          llt it = std::next(line_array.begin(), j);
           for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
         }
       }
-      cla::iterator it = std::next(line_array.begin(), p.y);
+      llt it = std::next(line_array.begin(), p.y);
       line_array.insert(it, nline);
 
       size = line_array.size();
@@ -126,7 +130,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     wed_mode = !wed_mode;
 
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    cla::iterator it = std::next(line_array.begin(), p.y);
+    llt it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
   }  
   break;
@@ -143,7 +147,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
     line.push_back(ch);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
-    else { cla::iterator it = std::next(line_array.begin(), p.y); (*it) = line; }
+    else { llt it = std::next(line_array.begin(), p.y); (*it) = line; }
     line_changed = 1;
     p.x += char_w;
     SetCaretPos(p.x, p.y*char_y);
@@ -186,11 +190,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == 0)           return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    cla::iterator it = std::next(line_array.begin(), p.y);
+    llt it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  
     it = std::next(line_array.begin(), p.y);
-    cl::iterator line_a = it->begin();
+    lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {
@@ -209,11 +213,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == line_n) return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    cla::iterator it = std::next(line_array.begin(), p.y);
+    llt it = std::next(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y += 1; 
     it = std::next(line_array.begin(), p.y);
-    cl::iterator line_a = it->begin();
+    lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {

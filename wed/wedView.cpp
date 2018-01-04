@@ -81,8 +81,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     if (p.y > line_n) 
     {
       line_n = p.y;
-      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.clear(); line.push_back(ch); line_array.push_back(line); }
-      else  line.clear();
+      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.push_back(ch); line_array.push_back(line); }
+      line.clear();
     }
     else 
     { 

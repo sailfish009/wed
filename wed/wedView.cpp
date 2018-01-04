@@ -2,7 +2,6 @@
 #include "wedView.h"
 #include "MainFrm.h"
 
-CH ch = { 0 };
 cla line_array;
 
 POINT CWedView::p = { 0 };                                                          // current position
@@ -57,10 +56,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-    llt it = n(line_array.begin(), p.y);
-    lt line_a = it->begin();
-    lt line_b = it->begin();
-    int e_n = it->size() -1;
+    llt it = n(line_array.begin(), p.y);  lt line_a = it->begin();  lt line_b = it->begin();  int e_n = it->size() -1;
     int count = 0;
     for (auto i = it->begin(); i != it->end(); i++)
     {
@@ -107,13 +103,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
           p.x = 0;
           for (auto i = it->begin(); i != it->end(); i++) 
           { 
-            CH ch = (*i); 
-            CClientDC pDC(m_hWnd);
-            pDC.SelectFont(m_font);
-            pDC.SetTextColor(FONTCOLOR);
-            pDC.SetBkColor(BACKGROUND);
-            ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
-            pDC.TextOut(ch.x, ch.y*char_y, (LPCTSTR)&ch.c);
+            drawtext((*i),wParam);
             line.push_back(ch);
             line_changed = 1;
             p.x += ch.w;
@@ -140,13 +130,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   default:  
   {
     HideCaret();
-    CClientDC pDC(m_hWnd);
-    pDC.SelectFont(m_font);
-    pDC.GetCharWidth32((UINT)wParam, (UINT)wParam, &char_w);
-    pDC.SetTextColor(FONTCOLOR);
-    pDC.SetBkColor(BACKGROUND);
-    ch.x = p.x, ch.y = p.y, ch.c = wParam, ch.w = char_w;
-    pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
+    drawtext(ch, wParam);
     line.push_back(ch);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
     else { llt it = n(line_array.begin(), p.y); (*it) = line; }
@@ -236,6 +220,16 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   return 0;
 }
 
+void CWedView::drawtext(CH& c, const WPARAM& w)
+{
+  CClientDC pDC(m_hWnd);
+  pDC.SelectFont(m_font);
+  pDC.SetTextColor(FONTCOLOR);
+  pDC.SetBkColor(BACKGROUND);
+  pDC.GetCharWidth32((UINT)w, (UINT)w, &char_w);
+  c.x = p.x, c.y = p.y, c.c = w, c.w = char_w;
+  pDC.TextOut(c.x, c.y*char_y, (LPCTSTR)&w);
+}
 
 LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
@@ -250,8 +244,8 @@ LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+  CMainFrame::this_ptr->SetStatusBar(L"");
   SetCaretPos(p.x, p.y*char_y);
   ShowCaret();
   return 0;
 }
-

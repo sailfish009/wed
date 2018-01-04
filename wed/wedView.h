@@ -78,7 +78,10 @@ public:
   TEXTMETRIC m_tm;
   long char_x;
   long char_y;
+
+  CH ch = { 0 };
   cl line;
+  void drawtext(CH& c, const WPARAM& w);
 
   static POINT p;                                                                // current position
   static int line_n;

@@ -80,8 +80,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     p.x = 0;  p.y += 1;
     if (p.y > line_n) 
     {
-      if (line.size()) { line_array.push_back(line); line_n = p.y; line.clear();}
-      else { printf("size: %d\n", line.size());   ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.clear(); line.push_back(ch); line_array.push_back(line); printf("size: %d\n", line.size()); line.clear(); }
+      line_n = p.y;
+      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.clear(); line.push_back(ch); line_array.push_back(line); }
+      else  line.clear();
     }
     else 
     { 

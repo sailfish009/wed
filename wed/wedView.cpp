@@ -38,7 +38,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     //printf("control key pressed: %d\n", wParam);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    llt it = std::next(line_array.begin(), p.y);
+    llt it = n(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
 
     switch (wParam)
@@ -57,7 +57,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-    llt it = std::next(line_array.begin(), p.y);
+    llt it = n(line_array.begin(), p.y);
     lt line_a = it->begin();
     lt line_b = it->begin();
     int e_n = it->size() -1;
@@ -67,7 +67,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       if (count >= e_n) { CH ch = (*i); p.x -= ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect);  }
       ++count;
     }
-    if (p.x > 0) { std::advance(line_a, e_n); std::advance(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
+    if (p.x > 0) { pos(line_a, e_n); pos(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
     else { line.clear(); line_array.erase(it); p.x = 0; }
     SetCaretPos(p.x, p.y*char_y);
     ShowCaret();
@@ -92,11 +92,11 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       {
         if (j >= (size_t)p.y) 
         { 
-          llt it = std::next(line_array.begin(), j);
+          llt it = n(line_array.begin(), j);
           for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
         }
       }
-      llt it = std::next(line_array.begin(), p.y);
+      llt it = n(line_array.begin(), p.y);
       line_array.insert(it, nline);
 
       size = line_array.size();
@@ -132,7 +132,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     wed_mode = !wed_mode;
 
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    llt it = std::next(line_array.begin(), p.y);
+    llt it = n(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
   }  
   break;
@@ -149,7 +149,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     pDC.TextOut(p.x, p.y*char_y, (LPCTSTR)&wParam);
     line.push_back(ch);
     if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
-    else { llt it = std::next(line_array.begin(), p.y); (*it) = line; }
+    else { llt it = n(line_array.begin(), p.y); (*it) = line; }
     line_changed = 1;
     p.x += char_w;
     SetCaretPos(p.x, p.y*char_y);
@@ -192,16 +192,16 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == 0)           return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    llt it = std::next(line_array.begin(), p.y);
+    llt it = n(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  
-    it = std::next(line_array.begin(), p.y);
+    it = n(line_array.begin(), p.y);
     lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {
       int e_n = line_size -1;
-      std::advance(line_a, e_n);
+      pos(line_a, e_n);
       p.x = (*line_a).x + (*line_a).w;
     }
     else p.x = 0;
@@ -215,16 +215,16 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
     if (p.y == line_n) return 1; 
     HideCaret();  
     if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    llt it = std::next(line_array.begin(), p.y);
+    llt it = n(line_array.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y += 1; 
-    it = std::next(line_array.begin(), p.y);
+    it = n(line_array.begin(), p.y);
     lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
     {
       int e_n = line_size - 1;
-      std::advance(line_a, e_n);
+      pos(line_a, e_n);
       p.x = (*line_a).x + (*line_a).w;
     }
     else p.x = 0;

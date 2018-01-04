@@ -16,6 +16,12 @@
 #define BLUE_B 0
 #define BACKGROUND  (RGB(RED_B,GREEN_B,BLUE_B))
 
+#define ALIAS_TEMPLATE_FUNCTION(highLevelF, lowLevelF) \
+template<typename... Args> \
+inline auto highLevelF(Args&&... args) -> decltype(lowLevelF(std::forward<Args>(args)...)) \
+{ \
+    return lowLevelF(std::forward<Args>(args)...); \
+}
 
 using CH =
 struct
@@ -31,6 +37,9 @@ using cla = std::list<std::list<CH>>;        // Character List Array
 
 using lt = std::list<CH>::iterator;                             // List iterator
 using llt = std::list<std::list<CH>>::iterator;         // List List iterator
+
+ALIAS_TEMPLATE_FUNCTION(pos, std::advance)
+ALIAS_TEMPLATE_FUNCTION(n, std::next)
 
 class CWedView : public CWindowImpl<CWedView>
 {

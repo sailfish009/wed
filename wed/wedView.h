@@ -81,6 +81,7 @@ public:
 
   CH ch = { 0 };
   cl line;
+  UINT8 m_buffer[512] = { 0 };
   void drawtext(CH& c, const WPARAM& w);
 
   static POINT p;                                                                // current position

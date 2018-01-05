@@ -2,7 +2,7 @@
 #include "wedView.h"
 #include "MainFrm.h"
 
-cla line_array;
+cla LA;             // Line Array
 
 POINT CWedView::p = { 0 };                                                          // current position
 int CWedView::line_n = 0;
@@ -36,15 +36,15 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
   {
     //printf("control key pressed: %d\n", wParam);
-    if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    llt it = n(line_array.begin(), p.y);
+    if ((LA.size() == 0) || (LA.size() < (size_t)(p.y + 1))) LA.push_back(line);
+    llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
 
     switch (wParam)
     {
-    case 0x0F: file_work(1, &line_array); break;   // file read              //'o' - 96
-    case 0x13: file_work(0, &line_array); break;   // file write             //'s' - 96
-    case 0x03: show_console();                  break;   // show console  //'c' - 96
+    case 0x0F: file_work(1, &LA); break;   // file read              //'o' - 96
+    case 0x13: file_work(0, &LA); break;   // file write             //'s' - 96
+    case 0x03: show_console();   break;   // show console  //'c' - 96
     }
     return 1;
   }
@@ -56,7 +56,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   {
     if (p.x < 1) return 1;
     HideCaret();
-    llt it = n(line_array.begin(), p.y);  lt line_a = it->begin();  lt line_b = it->begin();  int e_n = it->size() -1;
+    llt it = n(LA.begin(), p.y);  lt line_a = it->begin();  lt line_b = it->begin();  int e_n = it->size() -1;
     int count = 0;
     for (auto i = it->begin(); i != it->end(); i++)
     {
@@ -64,7 +64,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       ++count;
     }
     if (p.x > 0) { pos(line_a, e_n); pos(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
-    else { line.clear(); line_array.erase(it); p.x = 0; }
+    else { line.clear(); LA.erase(it); p.x = 0; }
     SetCaretPos(p.x, p.y*char_y);
     ShowCaret();
   }  
@@ -77,38 +77,33 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     if (p.y > line_n) 
     {
       line_n = p.y;
-      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.push_back(ch); line_array.push_back(line); }
+      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.push_back(ch); LA.push_back(line); }
       line.clear();
     }
     else 
     { 
       cl nline;  
-      size_t size = line_array.size();
+      size_t size = LA.size();
       for (size_t j = 0; j < size; ++j) 
       {
         if (j >= (size_t)p.y) 
         { 
-          llt it = n(line_array.begin(), j);
-          for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
+          llt it = n(LA.begin(), j);
+          for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };   RedrawWindow(&rect);  
+        }
         }
       }
-      llt it = n(line_array.begin(), p.y);
-      line_array.insert(it, nline);
+      llt it = n(LA.begin(), p.y);
+      LA.insert(it, nline);
 
-      size = line_array.size();
-      for (size_t j = 0; j < size; ++j)
-      {
-        if (j > (size_t)p.y)
-        {
-          p.x = 0;
-          for (auto i = it->begin(); i != it->end(); i++) 
-          { 
-            drawtext((*i),wParam);
-            line.push_back(ch);
-            line_changed = 1;
-            p.x += ch.w;
-          }
-        }
+      size = LA.size();
+      for (size_t j = 0; j < size; ++j) 
+      { 
+        if (j > (size_t)p.y) 
+        { 
+          it = n(LA.begin(), j);  
+          for (auto i = it->begin(); i != it->end(); i++)  {  (*i).y = j;  drawtext((*i), NULL); }
+        }  
       }
       p.x = 0;
     }
@@ -121,8 +116,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   { 
     wed_mode = !wed_mode;
 
-    if ((line_array.size() == 0) || (line_array.size() < (size_t)(p.y + 1))) line_array.push_back(line);
-    llt it = n(line_array.begin(), p.y);
+    if ((LA.size() == 0) || (LA.size() < (size_t)(p.y + 1))) LA.push_back(line);
+    llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
   }  
   break;
@@ -132,8 +127,8 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     HideCaret();
     drawtext(ch, wParam);
     line.push_back(ch);
-    if ((line_array.size() == 0) || (line_array.size() < (size_t)(line_n + 1))) { line_array.push_back(line); }
-    else { llt it = n(line_array.begin(), p.y); (*it) = line; }
+    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) { LA.push_back(line); }
+    else { llt it = n(LA.begin(), p.y); (*it) = line; }
     line_changed = 1;
     p.x += char_w;
     SetCaretPos(p.x, p.y*char_y);
@@ -175,11 +170,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   { 
     if (p.y == 0)           return 1; 
     HideCaret();  
-    if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    llt it = n(line_array.begin(), p.y);
+    if ( LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
+    llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  
-    it = n(line_array.begin(), p.y);
+    it = n(LA.begin(), p.y);
     lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
@@ -198,11 +193,11 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   { 
     if (p.y == line_n) return 1; 
     HideCaret();  
-    if ( line_array.size() < (size_t)(p.y + 1)) line_array.push_back(line);
-    llt it = n(line_array.begin(), p.y);
+    if ( LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
+    llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y += 1; 
-    it = n(line_array.begin(), p.y);
+    it = n(LA.begin(), p.y);
     lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
@@ -226,9 +221,23 @@ void CWedView::drawtext(CH& c, const WPARAM& w)
   pDC.SelectFont(m_font);
   pDC.SetTextColor(FONTCOLOR);
   pDC.SetBkColor(BACKGROUND);
-  pDC.GetCharWidth32((UINT)w, (UINT)w, &char_w);
-  c.x = p.x, c.y = p.y, c.c = w, c.w = char_w;
-  pDC.TextOut(c.x, c.y*char_y, (LPCTSTR)&w);
+  switch (w)
+  {
+  case NULL: 
+  { 
+    WPARAM wp = c.c;
+    pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);
+  } 
+    break;
+
+  default:
+  {
+    pDC.GetCharWidth32((UINT)w, (UINT)w, &char_w);
+    c.x = p.x, c.y = p.y, c.c = w, c.w = char_w;
+    pDC.TextOut(c.x, c.y*char_y, (LPCTSTR)&w);
+  }
+    break;
+  }
 }
 
 LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)

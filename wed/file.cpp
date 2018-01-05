@@ -121,14 +121,3 @@ BOOL filepath(char(&file_path)[256])
   return FALSE;
 }
 
-BOOL dirpath(std::wstring& directory)
-{
-  CFolderDialog  dlg;
-  dlg.m_bi.lpszTitle = L"directory to save";
-  if (dlg.DoModal() == IDOK)
-  {
-    directory = dlg.GetFolderPath();
-    return TRUE;
-  }
-  return FALSE;
-}

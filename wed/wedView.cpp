@@ -44,6 +44,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     {
     case 0x0F: file_work(1, &LA); break;   // file read              //'o' - 96
     case 0x13: file_work(0, &LA); break;   // file write             //'s' - 96
+    case 0x02: build_work();         break;   // build                   //'b' - 96
     case 0x03: show_console();   break;   // show console  //'c' - 96
     }
     return 1;

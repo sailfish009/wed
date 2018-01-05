@@ -74,6 +74,10 @@ public:
   void write_file(cla *ptr);
   void read_file(cla *ptr);
 
+  std::thread build_worker;
+  void build_work();
+  void read_dir();
+
   static HFONT m_font;
   TEXTMETRIC m_tm;
   long char_x;

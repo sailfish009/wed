@@ -36,7 +36,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
   {
     //printf("control key pressed: %d\n", wParam);
-    if ((LA.size() == 0) || (LA.size() < (size_t)(p.y + 1))) LA.push_back(line);
+    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
     llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
 
@@ -89,8 +89,12 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
         if (j >= (size_t)p.y) 
         { 
           llt it = n(LA.begin(), j);
-          for (auto i = it->begin(); i != it->end(); i++) { CH ch = (*i); p.x += ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };   RedrawWindow(&rect);  
-        }
+          for (auto i = it->begin(); i != it->end(); i++) 
+          { 
+            CH ch = (*i); p.x += ch.w;  
+            RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };   
+            RedrawWindow(&rect);  
+          }
         }
       }
       llt it = n(LA.begin(), p.y);
@@ -116,7 +120,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   { 
     wed_mode = !wed_mode;
 
-    if ((LA.size() == 0) || (LA.size() < (size_t)(p.y + 1))) LA.push_back(line);
+    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
     llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
   }  
@@ -170,7 +174,6 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   { 
     if (p.y == 0)           return 1; 
     HideCaret();  
-    if ( LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
     llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;  

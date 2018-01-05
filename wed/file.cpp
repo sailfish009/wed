@@ -21,7 +21,6 @@ void CWedView::write_file( cla *ptr)
   char file_path[256] = { 0 };
   if (filepath(file_path))
   {
-    //printf("write filename: %s\n", file_path);
     fopen_s(&file, file_path, "wb");
     size_t line_size = ptr->size();
     for (size_t j = 0; j < line_size; ++j)
@@ -31,10 +30,7 @@ void CWedView::write_file( cla *ptr)
       fprintf(file, "\r\n");
     }
     fclose(file);
-
-    CMainFrame::this_ptr->SetStatusBar(L"file saved");
-    Sleep(500);
-    CMainFrame::this_ptr->SetStatusBar(L"");
+    CMainFrame::this_ptr->SetStatusBar(L"file saved");  Sleep(500); CMainFrame::this_ptr->SetStatusBar(L"");
   }
 }
 

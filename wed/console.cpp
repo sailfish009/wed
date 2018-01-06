@@ -98,8 +98,8 @@ HWND CreateConsoleWindow(HWND hwnd, RECT rect)
   wc.hInstance = (HINSTANCE)::GetModuleHandle(NULL);
   wc.hIcon = NULL;
   wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  //wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0)); 
-  wc.hbrBackground = CreateSolidBrush(RGB(255, 255, 255)); 
+  wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0)); 
+  //wc.hbrBackground = CreateSolidBrush(RGB(255, 255, 255)); 
   wc.lpszMenuName = NULL;
   wc.lpszClassName = _T("console");
   wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);

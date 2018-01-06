@@ -103,6 +103,8 @@ void CWedView::read_file(cla *ptr)
         break;
     }
     fclose(file);
+    line_n = p.y;
+    p.x = p.y = 0;
   }
 }
 

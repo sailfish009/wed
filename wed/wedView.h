@@ -16,6 +16,8 @@
 #define BLUE_B 0
 #define BACKGROUND  (RGB(RED_B,GREEN_B,BLUE_B))
 
+#define SCREEN_LINE 22
+
 #define ALIAS_TEMPLATE_FUNCTION(highLevelF, lowLevelF) \
 template<typename... Args> \
 inline auto highLevelF(Args&&... args) -> decltype(lowLevelF(std::forward<Args>(args)...)) \
@@ -85,8 +87,10 @@ public:
 
   CH ch = { 0 };
   cl line;
+  long first_line = SCREEN_LINE;
   UINT8 m_buffer[512] = { 0 };
-  void drawtext(CH& c, const WPARAM& w);
+  void drawtext(CH& c, const WPARAM& w, const LPARAM& l=NULL);
+  void clear_line(const long& line_pos);
 
   static POINT p;                                                                // current position
   static int line_n;

@@ -85,31 +85,17 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     { 
       cl nline;  
       size_t size = LA.size();
-      for (size_t j = 0; j < size; ++j) 
-      {
-        if (j >= (size_t)p.y) 
-        { 
-          llt it = n(LA.begin(), j);
-          for (auto i = it->begin(); i != it->end(); i++) 
-          { 
-            CH ch = (*i); p.x += ch.w;  
-            RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };   
-            RedrawWindow(&rect);  
-          }
-        }
-      }
+      for (size_t j = 0; j < size; ++j) if (j >= (size_t)p.y)  clear_line(j);
       llt it = n(LA.begin(), p.y);
       LA.insert(it, nline);
 
       size = LA.size();
       for (size_t j = 0; j < size; ++j) 
-      { 
         if (j > (size_t)p.y) 
         { 
           it = n(LA.begin(), j);  
           for (auto i = it->begin(); i != it->end(); i++)  {  (*i).y = j;  drawtext((*i), NULL); }
         }  
-      }
       p.x = 0;
     }
     SetCaretPos(p.x, p.y*char_y);
@@ -196,41 +182,65 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   case VK_DOWN:  
   { 
     if (p.y == line_n) return 1; 
-    HideCaret();  
-    if ( LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
-    llt it = n(LA.begin(), p.y);
-    if (line_changed) { line_changed = 0; it->swap(line); }
-    p.y += 1; 
-    it = n(LA.begin(), p.y);
-    lt line_a = it->begin();
-    int line_size = it->size();
-    if (line_size)
+    else if(p.y == first_line)
     {
-      int e_n = line_size - 1;
-      pos(line_a, e_n);
-      p.x = (*line_a).x + (*line_a).w;
+      HideCaret();
+      p.x = 0;
+      first_line = ++p.y;
+      llt it;
+      size_t size = LA.size();
+      for (size_t j = 0; j < size; ++j)
+      {
+        clear_line(j);
+      }
+      size_t init_pos = p.y - SCREEN_LINE;
+#if 0
+      for (size_t j = init_pos; j < size; ++j)
+      {
+        it = n(LA.begin(), j);
+        for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, j); }
+      }
+#endif
     }
-    else p.x = 0;
-    SetCaretPos(p.x, p.y*char_y); 
-    ShowCaret(); 
+    else
+    {
+      HideCaret();
+      if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
+      llt it = n(LA.begin(), p.y);
+      if (line_changed) { line_changed = 0; it->swap(line); }
+      ++p.y;
+      it = n(LA.begin(), p.y);
+      lt line_a = it->begin();
+      int line_size = it->size();
+      if (line_size)
+      {
+        pos(line_a, line_size - 1);
+        p.x = (*line_a).x + (*line_a).w;
+      }
+      else p.x = 0;
+      SetCaretPos(p.x, p.y*char_y);
+      ShowCaret();
+    }
   }  
   break;
   }
   return 0;
 }
 
-void CWedView::drawtext(CH& c, const WPARAM& w)
+void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 {
   CClientDC pDC(m_hWnd);
   pDC.SelectFont(m_font);
   pDC.SetTextColor(FONTCOLOR);
   pDC.SetBkColor(BACKGROUND);
+
   switch (w)
   {
   case NULL: 
   { 
-    WPARAM wp = c.c;
-    pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);
+    WPARAM wp = c.c; 
+    if (l == NULL) {  pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);  }
+    else                  {  pDC.TextOut(c.x, (c.y - l) *char_y, (LPCTSTR)&wp);  }
   } 
     break;
 
@@ -243,6 +253,22 @@ void CWedView::drawtext(CH& c, const WPARAM& w)
     break;
   }
 }
+
+
+void CWedView::clear_line(const long& line_pos)
+{
+  llt it = n(LA.begin(), line_pos);
+  for (auto i = it->begin(); i != it->end(); i++)
+  {
+    CH ch = (*i); p.x += ch.w;
+    if (line_pos == 0) printf("[%d]", ch.x);
+
+    RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };
+    RedrawWindow(&rect);
+  }
+  if (line_pos == 0) printf("\n");
+}
+
 
 LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {

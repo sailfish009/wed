@@ -42,16 +42,15 @@ void CWedView::read_file(cla *ptr)
     size_t size = ptr->size();
     switch(size)
     {
-    case 0:break;
+    case 0:
     case 1:
     {
       llt it = n(ptr->begin(), 0);
       for (auto i = it->begin(); i != it->end(); i++)
       {
         CH ch = (*i);
-        RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect);
+        RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y }; RedrawWindow(&rect);  
       }
-      ptr->clear();
     }
     break;
 
@@ -62,13 +61,13 @@ void CWedView::read_file(cla *ptr)
 
       auto i_a = it_a->begin();
       auto i_b = it_b->end(); --i_b;
-      RECT rect = { (*i_a).x, (*i_a).y*char_y, (*i_b).x + (*i_b).w, (*i_b).y*char_y + char_y };  InvalidateRect(&rect);
-      ptr->clear();
+      RECT rect = { (*i_a).x, (*i_a).y*char_y, (*i_b).x + (*i_b).w, (*i_b).y*char_y + char_y };  RedrawWindow(&rect);  
     }
       break;
     }
     
     p.x = p.y = 0;
+    ptr->clear();
 
     UINT8 buffer[512] = { 0 };
     FILE *file = nullptr;

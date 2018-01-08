@@ -87,7 +87,8 @@ public:
 
   CH ch = { 0 };
   cl line;
-  long first_line = SCREEN_LINE;
+  long first_line = 0;
+  long last_line = SCREEN_LINE;
   UINT8 m_buffer[512] = { 0 };
   void drawtext(CH& c, const WPARAM& w, const LPARAM& l=NULL);
   void clear_line(const long& line_pos);

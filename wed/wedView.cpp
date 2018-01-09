@@ -190,7 +190,7 @@ void CWedView::key_up()
   else
 #endif
   {
-    llt it = n(LA.begin(), p.y);
+    llt it = n(LA.begin(), p.y-first_line);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;
     it = n(LA.begin(), p.y);
@@ -203,7 +203,7 @@ void CWedView::key_up()
       p.x = (*line_a).x + (*line_a).w;
     }
     else p.x = 0;
-    SetCaretPos(p.x, p.y*char_y);
+    SetCaretPos(p.x, (p.y-first_line)*char_y);
   }
 }
 
@@ -212,6 +212,7 @@ void CWedView::key_down()
   if (p.y == line_n) return;
   else if (p.y == last_line)
   {
+    ++first_line;
     last_line = ++p.y;
     clear_screen();
     size_t init_pos = p.y - SCREEN_LINE;

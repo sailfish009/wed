@@ -86,7 +86,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     { 
       cl nline;  
       size_t size = LA.size();
-      for (size_t j = 0; j < size; ++j) if (j >= (size_t)p.y)  clear_line(j);
+      clear_line();
       llt it = n(LA.begin(), p.y);
       LA.insert(it, nline);
 
@@ -166,7 +166,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
       HideCaret();
       first_line = --p.y;
       //size_t size = LA.size();
-      for (size_t j = first_line; j <  (size_t)(first_line + SCREEN_LINE); ++j) clear_line(j);
+      clear_line();
       SetCaretPos(p.x, 0);
       ShowCaret();
     }
@@ -200,7 +200,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
       HideCaret();
       last_line = ++p.y;
       size_t size = LA.size();
-      for (size_t j = 0; j < SCREEN_LINE; ++j) clear_line(j);
+      clear_line();
       size_t init_pos = p.y - SCREEN_LINE;
       for (size_t j = init_pos; j < size; ++j)
       {
@@ -269,7 +269,7 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 }
 
 
-void CWedView::clear_line(const long& line_pos)
+void CWedView::clear_line()
 {
   RECT rect = { 0, 0,  char_x*512 + char_x, char_y* (SCREEN_LINE-1) + char_y };
   RedrawWindow(&rect);

@@ -91,7 +91,7 @@ public:
   long last_line = SCREEN_LINE;
   UINT8 m_buffer[512] = { 0 };
   void drawtext(CH& c, const WPARAM& w, const LPARAM& l=NULL);
-  void clear_line(const long& line_pos);
+  void clear_line();
 
   static POINT p;                                                                // current position
   static int line_n;

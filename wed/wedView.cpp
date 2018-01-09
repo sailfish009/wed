@@ -8,7 +8,7 @@ POINT CWedView::p = { 0 };                                                      
 int CWedView::line_n = 0;
 int CWedView::char_w = 0;
 BOOL CWedView::line_changed = 0;
-BOOL CWedView::wed_mode = 0;                                             // 0: edit mode,  1: save mode
+BOOL CWedView::wed_mode = 1;                                             // 0: edit mode,  1: save mode
 HFONT CWedView::m_font=nullptr;
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -51,83 +51,116 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     return 1;
   }
 
-  switch (wParam)
+  switch (wed_mode)
   {
-    // backspace
-  case 0x08:   
+    // Edit mode
+    //////////////////////////////////////////////////////////////////////////////////////
+  case 0:
   {
-    if (p.x < 1) return 1;
-    HideCaret();
-    llt it = n(LA.begin(), p.y);  lt line_a = it->begin();  lt line_b = it->begin();  int e_n = it->size() -1;
-    int count = 0;
-    for (auto i = it->begin(); i != it->end(); i++)
+    switch (wParam)
     {
-      if (count >= e_n) { CH ch = (*i); p.x -= ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect);  }
-      ++count;
+      // backspace
+    case 0x08:
+    {
+      if (p.x < 1) return 1;
+      HideCaret();
+      llt it = n(LA.begin(), p.y);  lt line_a = it->begin();  lt line_b = it->begin();  int e_n = it->size() - 1;
+      int count = 0;
+      for (auto i = it->begin(); i != it->end(); i++)
+      {
+        if (count >= e_n) { CH ch = (*i); p.x -= ch.w;  RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };  InvalidateRect(&rect); }
+        ++count;
+      }
+      if (p.x > 0) { pos(line_a, e_n); pos(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
+      else { line.clear(); LA.erase(it); p.x = 0; }
+      SetCaretPos(p.x, p.y*char_y);
+      ShowCaret();
     }
-    if (p.x > 0) { pos(line_a, e_n); pos(line_b, e_n + 1); it->erase(line_a, line_b); line = (*it); }
-    else { line.clear(); LA.erase(it); p.x = 0; }
-    SetCaretPos(p.x, p.y*char_y);
-    ShowCaret();
-  }  
-  break;
+    break;
 
-  // enter
-  case 0x0D:   
-    HideCaret();
-    p.x = 0;  p.y += 1;
-    if (p.y > line_n) 
+    // enter
+    case 0x0D:
+      HideCaret();
+      p.x = 0;  p.y += 1;
+      if (p.y > line_n)
+      {
+        line_n = p.y;
+        if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.push_back(ch); LA.push_back(line); }
+        line.clear();
+      }
+      else
+      {
+        cl nline;
+        size_t size = LA.size();
+        for (size_t j = 0; j < size; ++j) if (j >= (size_t)p.y)  clear_line(j);
+        llt it = n(LA.begin(), p.y);
+        LA.insert(it, nline);
+
+        size = LA.size();
+        for (size_t j = 0; j < size; ++j)
+          if (j >(size_t)p.y)
+          {
+            it = n(LA.begin(), j);
+            for (auto i = it->begin(); i != it->end(); i++) { (*i).y = j;  drawtext((*i), NULL); }
+          }
+        p.x = 0;
+      }
+      SetCaretPos(p.x, p.y*char_y);
+      ShowCaret();
+      break;
+
+      // ESC
+    case 0x1B:
     {
-      line_n = p.y;
-      if (line.size() == 0) { ch.x = 0, ch.y = p.y - 1, ch.c = ch.w = 0;  line.push_back(ch); LA.push_back(line); }
-      line.clear();
-    }
-    else 
-    { 
-      cl nline;  
-      size_t size = LA.size();
-      for (size_t j = 0; j < size; ++j) if (j >= (size_t)p.y)  clear_line(j);
+      wed_mode = !wed_mode;
+
+      if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
       llt it = n(LA.begin(), p.y);
-      LA.insert(it, nline);
-
-      size = LA.size();
-      for (size_t j = 0; j < size; ++j) 
-        if (j > (size_t)p.y) 
-        { 
-          it = n(LA.begin(), j);  
-          for (auto i = it->begin(); i != it->end(); i++)  {  (*i).y = j;  drawtext((*i), NULL); }
-        }  
-      p.x = 0;
+      if (line_changed) { line_changed = 0; it->swap(line); }
     }
-    SetCaretPos(p.x, p.y*char_y);
-    ShowCaret();
     break;
 
-  // ESC
-  case 0x1B:   
-  { 
-    wed_mode = !wed_mode;
+    default:
+    {
+      HideCaret();
+      drawtext(ch, wParam);
+      line.push_back(ch);
+      if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) { LA.push_back(line); }
+      else { llt it = n(LA.begin(), p.y); (*it) = line; }
+      line_changed = 1;
+      p.x += char_w;
+      SetCaretPos(p.x, p.y*char_y);
+      ShowCaret();
+    }
+    break;
+    }
 
-    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
-    llt it = n(LA.begin(), p.y);
-    if (line_changed) { line_changed = 0; it->swap(line); }
-  }  
-  break;
+  }
+    break;
+    ////////////////////////////////////////END//////////////////////////////////////////
 
-  default:  
+    // Save mode
+    //////////////////////////////////////////////////////////////////////////////////////
+  default:
   {
-    HideCaret();
-    drawtext(ch, wParam);
-    line.push_back(ch);
-    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) { LA.push_back(line); }
-    else { llt it = n(LA.begin(), p.y); (*it) = line; }
-    line_changed = 1;
-    p.x += char_w;
-    SetCaretPos(p.x, p.y*char_y);
-    ShowCaret();
+    switch (wParam)
+    {
+    case 0x69: wed_mode = 0;     break; // 'i'
+    case 0x68: key_left();                break; // 'h'
+    case 0x6C: key_right();             break; // 'l'
+    case 0x6B: key_up();                 break; // 'k'
+    case 0x6A: key_down();           break; // 'j'
+
+    default:
+      break;
+    }
+
   }
     break;
+    ////////////////////////////////////////END//////////////////////////////////////////
   }
+
+ 
   return 0;
 }
 
@@ -135,104 +168,10 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
 {
   switch (wParam)
   {
-  case VK_LEFT:       
-  {
-    if (p.x == 0)  return 1;
-    HideCaret(); 
-    int char_w = 0;
-    for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
-    p.x -= char_w;
-    SetCaretPos(p.x, p.y*char_y); 
-    ShowCaret(); 
-  }
-    break;
-
-  case VK_RIGHT:    
-  {
-    HideCaret(); 
-    int char_w = 0;
-    for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
-    p.x += char_w;
-    SetCaretPos(p.x, p.y*char_y); 
-    ShowCaret(); 
-  }
-    break;
-
-  case VK_UP:         
-  { 
-    if (p.y == 0)           return 1; 
-#if 0
-    else if (p.y == first_line )
-    {
-      HideCaret();
-      first_line = --p.y;
-      //size_t size = LA.size();
-      clear_line();
-      SetCaretPos(p.x, 0);
-      ShowCaret();
-    }
-    else
-#endif
-    {
-      HideCaret();
-      llt it = n(LA.begin(), p.y);
-      if (line_changed) { line_changed = 0; it->swap(line); }
-      p.y -= 1;
-      it = n(LA.begin(), p.y);
-      lt line_a = it->begin();
-      int line_size = it->size();
-      if (line_size)
-      {
-        int e_n = line_size - 1;
-        pos(line_a, e_n);
-        p.x = (*line_a).x + (*line_a).w;
-      }
-      else p.x = 0;
-      SetCaretPos(p.x, p.y*char_y);
-      ShowCaret();
-    }
-  }  
-  break;
-
-  case VK_DOWN:  
-  { 
-    if (p.y == line_n) return 1; 
-    else if(p.y == last_line)
-    {
-      HideCaret();
-      last_line = ++p.y;
-      size_t size = LA.size();
-      clear_screen();
-      size_t init_pos = p.y - SCREEN_LINE;
-      for (size_t j = init_pos; j < size; ++j)
-      {
-        llt it = n(LA.begin(), j);
-        for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1) * init_pos); }
-      }
-      SetCaretPos(p.x, SCREEN_LINE*char_y);
-      ShowCaret();
-    }
-    else
-    {
-      HideCaret();
-      if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
-      llt it = n(LA.begin(), p.y);
-      if (line_changed) { line_changed = 0; it->swap(line); }
-      ++p.y;
-      it = n(LA.begin(), p.y);
-      lt line_a = it->begin();
-      int line_size = it->size();
-      if (line_size)
-      {
-        pos(line_a, line_size - 1);
-        p.x = (*line_a).x + (*line_a).w;
-      }
-      else p.x = 0;
-      SetCaretPos(p.x, p.y*char_y);
-      ShowCaret();
-    }
-  }  
-  break;
+  case VK_LEFT:       key_left();       break;
+  case VK_RIGHT:    key_right();    break;
+  case VK_UP:           key_up();        break;
+  case VK_DOWN:    key_down();  break;
   }
   return 0;
 }
@@ -279,6 +218,101 @@ void CWedView::clear_screen()
 {
   RECT rect = { 0, 0,  char_x*512 + char_x, char_y* SCREEN_LINE + char_y };
   RedrawWindow(&rect);
+}
+
+void CWedView::key_up()
+{
+  if (p.y == 0)           return;
+#if 0
+  else if (p.y == first_line)
+  {
+    HideCaret();
+    first_line = --p.y;
+    //size_t size = LA.size();
+    clear_line();
+    SetCaretPos(p.x, 0);
+    ShowCaret();
+  }
+  else
+#endif
+  {
+    HideCaret();
+    llt it = n(LA.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+    p.y -= 1;
+    it = n(LA.begin(), p.y);
+    lt line_a = it->begin();
+    int line_size = it->size();
+    if (line_size)
+    {
+      int e_n = line_size - 1;
+      pos(line_a, e_n);
+      p.x = (*line_a).x + (*line_a).w;
+    }
+    else p.x = 0;
+    SetCaretPos(p.x, p.y*char_y);
+    ShowCaret();
+  }
+}
+
+void CWedView::key_down()
+{
+  if (p.y == line_n) return;
+  else if (p.y == last_line)
+  {
+    HideCaret();
+    last_line = ++p.y;
+    size_t size = LA.size();
+    clear_screen();
+    size_t init_pos = p.y - SCREEN_LINE;
+    for (size_t j = init_pos; j < size; ++j)
+    {
+      llt it = n(LA.begin(), j);
+      for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1) * init_pos); }
+    }
+    SetCaretPos(p.x, SCREEN_LINE*char_y);
+    ShowCaret();
+  }
+  else
+  {
+    HideCaret();
+    if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
+    llt it = n(LA.begin(), p.y);
+    if (line_changed) { line_changed = 0; it->swap(line); }
+    ++p.y;
+    it = n(LA.begin(), p.y);
+    lt line_a = it->begin();
+    int line_size = it->size();
+    if (line_size)
+    {
+      pos(line_a, line_size - 1);
+      p.x = (*line_a).x + (*line_a).w;
+    }
+    else p.x = 0;
+    SetCaretPos(p.x, p.y*char_y);
+    ShowCaret();
+  }
+}
+
+void CWedView::key_right()
+{
+  HideCaret();
+  int char_w = 0;
+  for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
+  p.x += char_w;
+  SetCaretPos(p.x, p.y*char_y);
+  ShowCaret();
+}
+
+void CWedView::key_left()
+{
+  if (p.x == 0)  return;
+  HideCaret();
+  int char_w = 0;
+  for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
+  p.x -= char_w;
+  SetCaretPos(p.x, p.y*char_y);
+  ShowCaret();
 }
 
 

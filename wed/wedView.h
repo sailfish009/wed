@@ -94,6 +94,11 @@ public:
   void clear_line(const long& line_pos);
   void clear_screen();
 
+  void key_up();
+  void key_down();
+  void key_right();
+  void key_left();
+
   static POINT p;                                                                // current position
   static int line_n;
   static int char_w;

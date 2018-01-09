@@ -100,15 +100,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
       break;
 
       // ESC
-    case 0x1B:
-    {
-      wed_mode = !wed_mode;
-
-      if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
-      llt it = n(LA.begin(), p.y);
-      if (line_changed) { line_changed = 0; it->swap(line); }
-    }
-    break;
+    case 0x1B: { wed_mode = !wed_mode; save();} break;
 
     default:
     {

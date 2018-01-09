@@ -275,10 +275,13 @@ void CWedView::key_down()
   }
   else
   {
+    if ( LA.size() ==  (size_t)(p.y +1) ) return; 
     HideCaret();
-    if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
     llt it = n(LA.begin(), p.y);
+#if 0
+    if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
     if (line_changed) { line_changed = 0; it->swap(line); }
+#endif
     ++p.y;
     it = n(LA.begin(), p.y);
     lt line_a = it->begin();

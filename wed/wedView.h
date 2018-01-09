@@ -98,6 +98,7 @@ public:
   void key_down();
   void key_right();
   void key_left();
+  void save();
 
   static POINT p;                                                                // current position
   static int line_n;

@@ -35,19 +35,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
   {
     HideCaret();
-    if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
-    llt it = n(LA.begin(), p.y);
-    if (line_changed) { line_changed = 0; it->swap(line); }
-
-    switch (wParam)
-    {
-    case 0x0F: file_work(1, &LA); break;   // file read              //'o' - 96
-    case 0x13: file_work(0, &LA); break;   // file write             //'s' - 96
-    case 0x02: build_work();         break;   // build                   //'b' - 96
-    case 0x03: show_console();   break;   // show console  //'c' - 96
-    }
-    SetCaretPos(0, 0);
-    ShowCaret();
+    save();
+    // CTRL + o: open,  +s: save,  +b: build, +c: console
+    switch (wParam) {case 0x0F: file_work(1, &LA); break; case 0x13: file_work(0, &LA); break; case 0x02: build_work(); break; case 0x03: show_console(); break; }
     return 1;
   }
 
@@ -139,40 +129,25 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     break;
     ////////////////////////////////////////END//////////////////////////////////////////
 
+
     // Save mode
     //////////////////////////////////////////////////////////////////////////////////////
   default:
   {
-    switch (wParam)
-    {
-    case 0x69: wed_mode = 0;     break; // 'i'
-    case 0x68: key_left();                break; // 'h'
-    case 0x6C: key_right();             break; // 'l'
-    case 0x6B: key_up();                 break; // 'k'
-    case 0x6A: key_down();           break; // 'j'
-
-    default:
-      break;
-    }
-
+    HideCaret();
+    switch (wParam) { case 0x69: wed_mode = 0; break; case 0x68: key_left();break; case 0x6C: key_right(); break; case 0x6B: key_up(); break; case 0x6A: key_down(); break; }
+    ShowCaret();
   }
     break;
     ////////////////////////////////////////END//////////////////////////////////////////
   }
 
- 
   return 0;
 }
 
 LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
-  switch (wParam)
-  {
-  case VK_LEFT:       key_left();       break;
-  case VK_RIGHT:    key_right();    break;
-  case VK_UP:           key_up();        break;
-  case VK_DOWN:    key_down();  break;
-  }
+  switch (wParam) { case VK_LEFT: key_left(); break;  case VK_RIGHT: key_right(); break; case VK_UP: key_up(); break; case VK_DOWN: key_down();break; }
   return 0;
 }
 
@@ -185,13 +160,7 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 
   switch (w)
   {
-  case NULL: 
-  { 
-    WPARAM wp = c.c; 
-    if (l == NULL)   pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);  
-    else                    pDC.TextOut(c.x, (c.y + l) *char_y, (LPCTSTR)&wp);  
-  } 
-    break;
+  case NULL: { WPARAM wp = c.c;  if (l == NULL)   pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);  else  pDC.TextOut(c.x, (c.y + l) *char_y, (LPCTSTR)&wp); }  break;
 
   default:
   {
@@ -226,17 +195,14 @@ void CWedView::key_up()
 #if 0
   else if (p.y == first_line)
   {
-    HideCaret();
     first_line = --p.y;
     //size_t size = LA.size();
     clear_line();
     SetCaretPos(p.x, 0);
-    ShowCaret();
   }
   else
 #endif
   {
-    HideCaret();
     llt it = n(LA.begin(), p.y);
     if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;
@@ -251,7 +217,6 @@ void CWedView::key_up()
     }
     else p.x = 0;
     SetCaretPos(p.x, p.y*char_y);
-    ShowCaret();
   }
 }
 
@@ -260,30 +225,17 @@ void CWedView::key_down()
   if (p.y == line_n) return;
   else if (p.y == last_line)
   {
-    HideCaret();
     last_line = ++p.y;
-    size_t size = LA.size();
     clear_screen();
     size_t init_pos = p.y - SCREEN_LINE;
-    for (size_t j = init_pos; j < size; ++j)
-    {
-      llt it = n(LA.begin(), j);
-      for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1) * init_pos); }
-    }
+    for (size_t j = init_pos; j < LA.size(); ++j) { llt it = n(LA.begin(), j); for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1) * init_pos); } }
     SetCaretPos(p.x, SCREEN_LINE*char_y);
-    ShowCaret();
   }
   else
   {
     if ( LA.size() ==  (size_t)(p.y +1) ) return; 
-    HideCaret();
-    llt it = n(LA.begin(), p.y);
-#if 0
-    if (LA.size() < (size_t)(p.y + 1)) LA.push_back(line);
-    if (line_changed) { line_changed = 0; it->swap(line); }
-#endif
     ++p.y;
-    it = n(LA.begin(), p.y);
+    llt it = n(LA.begin(), p.y);
     lt line_a = it->begin();
     int line_size = it->size();
     if (line_size)
@@ -293,29 +245,31 @@ void CWedView::key_down()
     }
     else p.x = 0;
     SetCaretPos(p.x, p.y*char_y);
-    ShowCaret();
   }
 }
 
 void CWedView::key_right()
 {
-  HideCaret();
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
   p.x += char_w;
   SetCaretPos(p.x, p.y*char_y);
-  ShowCaret();
 }
 
 void CWedView::key_left()
 {
   if (p.x == 0)  return;
-  HideCaret();
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
   p.x -= char_w;
   SetCaretPos(p.x, p.y*char_y);
-  ShowCaret();
+}
+
+void CWedView::save()
+{
+  if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
+  llt it = n(LA.begin(), p.y);
+  if (line_changed) { line_changed = 0; it->swap(line); }
 }
 
 

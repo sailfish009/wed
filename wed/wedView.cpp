@@ -86,7 +86,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     { 
       cl nline;  
       size_t size = LA.size();
-      clear_line();
+      for (size_t j = 0; j < size; ++j) if (j >= (size_t)p.y)  clear_line(j);
       llt it = n(LA.begin(), p.y);
       LA.insert(it, nline);
 
@@ -161,6 +161,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
   case VK_UP:         
   { 
     if (p.y == 0)           return 1; 
+#if 0
     else if (p.y == first_line )
     {
       HideCaret();
@@ -171,6 +172,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
       ShowCaret();
     }
     else
+#endif
     {
       HideCaret();
       llt it = n(LA.begin(), p.y);
@@ -200,7 +202,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
       HideCaret();
       last_line = ++p.y;
       size_t size = LA.size();
-      clear_line();
+      clear_screen();
       size_t init_pos = p.y - SCREEN_LINE;
       for (size_t j = init_pos; j < size; ++j)
       {
@@ -247,14 +249,8 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
   case NULL: 
   { 
     WPARAM wp = c.c; 
-    if (l == NULL) 
-    {  
-      pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);  
-    }
-    else                  
-    {  
-      pDC.TextOut(c.x, (c.y + l) *char_y, (LPCTSTR)&wp);  
-    }
+    if (l == NULL)   pDC.TextOut(c.x, c.y *char_y, (LPCTSTR)&wp);  
+    else                    pDC.TextOut(c.x, (c.y + l) *char_y, (LPCTSTR)&wp);  
   } 
     break;
 
@@ -268,8 +264,18 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
   }
 }
 
+void CWedView::clear_line(const long& line_pos)
+{
+  llt it = n(LA.begin(), line_pos);
+  for (auto i = it->begin(); i != it->end(); i++)
+  {
+    CH ch = (*i); p.x += ch.w;
+    RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };
+    RedrawWindow(&rect);
+  }
+}
 
-void CWedView::clear_line()
+void CWedView::clear_screen()
 {
   RECT rect = { 0, 0,  char_x*512 + char_x, char_y* SCREEN_LINE + char_y };
   RedrawWindow(&rect);

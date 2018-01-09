@@ -166,13 +166,8 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 
 void CWedView::clear_line(const long& line_pos)
 {
-  llt it = n(LA.begin(), line_pos);
-  for (auto i = it->begin(); i != it->end(); i++)
-  {
-    CH ch = (*i); p.x += ch.w;
-    RECT rect = { ch.x, ch.y*char_y, ch.x + ch.w, ch.y*char_y + char_y };
-    RedrawWindow(&rect);
-  }
+  RECT rect = { 0, line_pos*char_y,  char_x*512 + char_x, line_pos*char_y + char_y };
+  RedrawWindow(&rect);
 }
 
 void CWedView::clear_screen()
@@ -229,6 +224,7 @@ void CWedView::key_down()
         llt it = n(LA.begin(), j);
         for (auto i = it->begin(); i != it->end(); i++) { save_pos_x = (*i).x +(*i).w; drawtext((*i), NULL, (-1) * init_pos); }
       }
+      SetCaretPos(save_pos_x, SCREEN_LINE*char_y);
     }
     else
     {
@@ -237,8 +233,8 @@ void CWedView::key_down()
         llt it = n(LA.begin(), j);
         for (auto i = it->begin(); i != it->end(); i++) { save_pos_x = (*i).x+(*i).w; drawtext((*i), NULL, (-1) * init_pos); }
       }
+      SetCaretPos(save_pos_x, (size -1)*char_y);
     }
-    SetCaretPos(save_pos_x, SCREEN_LINE*char_y);
   }
   else
   {

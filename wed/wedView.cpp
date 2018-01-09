@@ -271,7 +271,7 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 
 void CWedView::clear_line()
 {
-  RECT rect = { 0, 0,  char_x*512 + char_x, char_y* (SCREEN_LINE-1) + char_y };
+  RECT rect = { 0, 0,  char_x*512 + char_x, char_y* SCREEN_LINE + char_y };
   RedrawWindow(&rect);
 }
 

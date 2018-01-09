@@ -220,8 +220,25 @@ void CWedView::key_down()
     last_line = ++p.y;
     clear_screen();
     size_t init_pos = p.y - SCREEN_LINE;
-    for (size_t j = init_pos; j < LA.size(); ++j) { llt it = n(LA.begin(), j); for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1) * init_pos); } }
-    SetCaretPos(p.x, SCREEN_LINE*char_y);
+    long  save_pos_x = 0;
+    size_t size = LA.size();
+    if (size > (size_t)p.y)
+    {
+      for (size_t j = init_pos; j < (init_pos + SCREEN_LINE +1); ++j)
+      {
+        llt it = n(LA.begin(), j);
+        for (auto i = it->begin(); i != it->end(); i++) { save_pos_x = (*i).x +(*i).w; drawtext((*i), NULL, (-1) * init_pos); }
+      }
+    }
+    else
+    {
+      for (size_t j = init_pos; j < size; ++j)
+      {
+        llt it = n(LA.begin(), j);
+        for (auto i = it->begin(); i != it->end(); i++) { save_pos_x = (*i).x+(*i).w; drawtext((*i), NULL, (-1) * init_pos); }
+      }
+    }
+    SetCaretPos(save_pos_x, SCREEN_LINE*char_y);
   }
   else
   {

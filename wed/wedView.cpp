@@ -2,13 +2,13 @@
 #include "wedView.h"
 #include "MainFrm.h"
 
-cla LA;             // Line Array
+cla LA; // Line Array
 
-POINT CWedView::p = { 0 };                                                          // current position
+POINT CWedView::p = { 0 }; // current position
 int CWedView::line_n = 0;
 int CWedView::char_w = 0;
 BOOL CWedView::line_changed = 0;
-BOOL CWedView::wed_mode = 1;                                             // 0: edit mode,  1: save mode
+BOOL CWedView::wed_mode = 1; // 0: edit mode,  1: save mode
 HFONT CWedView::m_font=nullptr;
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -164,34 +164,44 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
   }
 }
 
-void CWedView::clear_line(const long& line_pos)
-{
-  RECT rect = { 0, line_pos*char_y,  char_x*512 + char_x, line_pos*char_y + char_y };
-  RedrawWindow(&rect);
-}
-
-void CWedView::clear_screen()
-{
-  RECT rect = { 0, 0,  char_x*512 + char_x, char_y* SCREEN_LINE + char_y };
-  RedrawWindow(&rect);
-}
-
 void CWedView::key_up()
 {
   if (p.y == 0)           return;
-#if 0
+#if 1
   else if (p.y == first_line)
   {
-    first_line = --p.y;
-    //size_t size = LA.size();
-    clear_line();
-    SetCaretPos(p.x, 0);
+    --first_line;
+    --last_line;
+    --p.y;
+    clear_screen();
+    long  save_pos_x = 0;
+    size_t size = LA.size();
+    llt it = n(LA.begin(), first_line);
+    auto pos_x = it->end();
+    pos(pos_x, -1);
+    save_pos_x = (*pos_x).x + (*pos_x).w;
+    if (size > (size_t)p.y)
+    {
+      for (size_t j = first_line; j < (size_t)(first_line + SCREEN_LINE + 1); ++j)
+      {
+        it = n(LA.begin(), j);
+        for (auto i = it->begin(); i != it->end(); i++) {  drawtext((*i), NULL,  first_line); }
+      }
+    }
+    else
+    {
+      for (size_t j = first_line; j < size; ++j)
+      {
+        it = n(LA.begin(), j);
+        for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL,  first_line); }
+      }
+    }
+    SetCaretPos(save_pos_x, 0);
   }
   else
 #endif
   {
     llt it = n(LA.begin(), p.y-first_line);
-    if (line_changed) { line_changed = 0; it->swap(line); }
     p.y -= 1;
     it = n(LA.begin(), p.y);
     lt line_a = it->begin();
@@ -213,7 +223,8 @@ void CWedView::key_down()
   else if (p.y == last_line)
   {
     ++first_line;
-    last_line = ++p.y;
+    ++last_line;  
+    ++p.y;
     clear_screen();
     size_t init_pos = p.y - SCREEN_LINE;
     long  save_pos_x = 0;
@@ -258,8 +269,7 @@ void CWedView::key_right()
 {
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
-  p.x += char_w;
-  SetCaretPos(p.x, p.y*char_y);
+  p.x += char_w;  SetCaretPos(p.x, p.y*char_y);
 }
 
 void CWedView::key_left()
@@ -267,27 +277,13 @@ void CWedView::key_left()
   if (p.x == 0)  return;
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
-  p.x -= char_w;
-  SetCaretPos(p.x, p.y*char_y);
+  p.x -= char_w;  SetCaretPos(p.x, p.y*char_y);
 }
 
 void CWedView::save()
 {
-  if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) LA.push_back(line);
-  llt it = n(LA.begin(), p.y);
-  if (line_changed) { line_changed = 0; it->swap(line); }
-}
-
-
-LRESULT CWedView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-{
-  CPaintDC dc(m_hWnd);
-  return 0;
-}
-
-LRESULT CWedView::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-{
-  return 0;
+  if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1)))   LA.push_back(line);
+  if (line_changed)                                                                 { line_changed = 0; llt it = n(LA.begin(), p.y); it->swap(line); }
 }
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)

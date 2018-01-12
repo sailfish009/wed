@@ -91,8 +91,6 @@ public:
   long last_line = SCREEN_LINE;
   UINT8 m_buffer[512] = { 0 };
   void drawtext(CH& c, const WPARAM& w, const LPARAM& l=NULL);
-  void clear_line(const long& line_pos);
-  void clear_screen();
 
   void key_up();
   void key_down();
@@ -109,7 +107,27 @@ public:
   LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnChar(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-  LRESULT OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-  LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+
+  LRESULT OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+  {
+    CPaintDC dc(m_hWnd);
+    return 0;
+  }
+
+  LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+  {
+    return 0;
+  }
+
+  void clear_line(const long& line_pos)
+  {
+    RECT rect = { 0, line_pos*char_y,  char_x * 512 + char_x, line_pos*char_y + char_y };  RedrawWindow(&rect);
+  }
+
+  void clear_screen()
+  {
+    RECT rect = { 0, 0,  char_x * 512 + char_x, char_y* SCREEN_LINE + char_y };  RedrawWindow(&rect);
+  }
+
 };

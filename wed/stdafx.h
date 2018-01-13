@@ -18,6 +18,8 @@ extern CAppModule _Module;
 
 #include <atlwin.h>
 
+#pragma comment(lib, "atlthunk.lib")
+
 #if 1
 #ifdef _UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") 

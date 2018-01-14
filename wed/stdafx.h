@@ -20,6 +20,9 @@ extern CAppModule _Module;
 
 #pragma comment(lib, "atlthunk.lib")
 
+//LNK2019: __vsnwprintf_s for vs2017 express
+#pragma comment(lib, "legacy_stdio_definitions.lib")  
+
 #if 1
 #ifdef _UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") 

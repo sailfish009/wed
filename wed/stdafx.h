@@ -20,8 +20,10 @@ extern CAppModule _Module;
 
 #pragma comment(lib, "atlthunk.lib")
 
+#if (_MSC_VER > 1900)
 //LNK2019: __vsnwprintf_s for vs2017 express
 #pragma comment(lib, "legacy_stdio_definitions.lib")  
+#endif
 
 #if 1
 #ifdef _UNICODE

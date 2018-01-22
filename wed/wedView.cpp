@@ -277,23 +277,27 @@ void CWedView::key_down()
 
 void CWedView::key_right()
 {
+#if 0
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
   p.x += char_w;  SetCaretPos(p.x, p.y*char_y);
+#endif
 }
 
 void CWedView::key_left()
 {
+#if 0
   if (p.x == 0)  return;
   int char_w = 0;
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
   p.x -= char_w;  SetCaretPos(p.x, p.y*char_y);
+#endif
 }
 
 void CWedView::save()
 {
   if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1)))   LA.push_back(line);
-  if (line_changed)                                                                 { line_changed = 0; llt it = n(LA.begin(), p.y); it->swap(line); }
+  if (line_changed) { line_changed = 0; llt it = n(LA.begin(), p.y); it->swap(line); }
 }
 
 LRESULT CWedView::OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)

@@ -1,3 +1,29 @@
+//========================================================================
+// wed - simple win32 text editor written in c++ (WTL) 
+//------------------------------------------------------------------------
+// Copyright (c) 2017-2018 Ji Wong Park <sailfish009@gmail.com>
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
+
 #include "stdafx.h"
 #include "wedView.h"
 #include "MainFrm.h"
@@ -15,10 +41,8 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 {
   HBRUSH brush  = CreateSolidBrush(BACKGROUND);
   SetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND, (LONG)brush);
-
   m_font = CreateFont(18, 0, 0, 0, FW_LIGHT, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,  DEFAULT_QUALITY, DEFAULT_PITCH, 
-    L"Dejavu Sans Mono");
-    //L"Source Sans Pro");
+    L"Dejavu Sans Mono");  //L"Source Sans Pro");
   if (m_font) SetFont(m_font);
 
   CClientDC pDC(m_hWnd);
@@ -167,7 +191,6 @@ void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 void CWedView::key_up()
 {
   if (p.y == 0)           return;
-#if 1
   else if (p.y == first_line)
   {
     --first_line;
@@ -180,26 +203,14 @@ void CWedView::key_up()
     auto pos_x = it->end();
     pos(pos_x, -1);
     save_pos_x = (*pos_x).x + (*pos_x).w;
-    if (size > (size_t)p.y)
-    {
-      for (size_t j = first_line; j < (size_t)(first_line + SCREEN_LINE + 1); ++j)
-      {
-        it = n(LA.begin(), j);
-        for (auto i = it->begin(); i != it->end(); i++) {  drawtext((*i), NULL,  first_line); }
-      }
-    }
-    else
-    {
-      for (size_t j = first_line; j < size; ++j)
-      {
-        it = n(LA.begin(), j);
-        for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL,  first_line); }
-      }
-    }
+	  for (size_t j = first_line; j < (size_t)(first_line + SCREEN_LINE + 1); ++j)
+	  {
+		  it = n(LA.begin(), j);
+		  for (auto i = it->begin(); i != it->end(); i++) { drawtext((*i), NULL, (-1)*first_line); }
+	  }
     SetCaretPos(save_pos_x, 0);
   }
   else
-#endif
   {
     llt it = n(LA.begin(), p.y-first_line);
     p.y -= 1;

@@ -1,3 +1,29 @@
+//========================================================================
+// wed - simple win32 text editor written in c++ (WTL) 
+//------------------------------------------------------------------------
+// Copyright (c) 2017-2018 Ji Wong Park <sailfish009@gmail.com>
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
+
 // wedView.h : interface of the CWedView class
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -28,17 +54,17 @@ inline auto highLevelF(Args&&... args) -> decltype(lowLevelF(std::forward<Args>(
 using CH =
 struct
 {
-  long x;                        // character x position
-  long y;                        // character y position
-  UINT8 c;                    // character content
-  UINT8 w;                   // character width
+  long x;                                             // character x position
+  long y;                                             // character y position
+  UINT8 c;                                            // character content
+  UINT8 w;                                            // character width
 };
 
 using cl = std::list<CH>;                             // Character List
-using cla = std::list<std::list<CH>>;        // Character List Array
+using cla = std::list<std::list<CH>>;                 // Character List Array
 
-using lt = std::list<CH>::iterator;                             // List iterator
-using llt = std::list<std::list<CH>>::iterator;         // List List iterator
+using lt = std::list<CH>::iterator;                   // List iterator
+using llt = std::list<std::list<CH>>::iterator;       // List List iterator
 
 ALIAS_TEMPLATE_FUNCTION(pos, std::advance)
 ALIAS_TEMPLATE_FUNCTION(n, std::next)
@@ -98,7 +124,7 @@ public:
   void key_left();
   void save();
 
-  static POINT p;                                                                // current position
+  static POINT p;                                                   // current position
   static int line_n;
   static int char_w;
   static BOOL line_changed;

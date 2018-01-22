@@ -124,11 +124,15 @@ public:
   void key_left();
   void save();
 
+  void key_dd();
+  void key_zz();
+
   static POINT p;                                                   // current position
   static int line_n;
   static int char_w;
   static BOOL line_changed;
   static BOOL wed_mode;                                             // 0: edit mode,  1: save mode
+  static UINT8 wed_comb;                                            // key combination check
 
   LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
   LRESULT OnChar(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

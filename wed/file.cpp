@@ -97,7 +97,7 @@ void CWedView::read_file(cla *ptr)
           line.push_back(ch);
         }
         ptr->push_back(line);
-        p.y += 1;
+        ++p.y;
       }
       else
         break;

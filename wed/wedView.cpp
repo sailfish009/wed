@@ -30,11 +30,12 @@
 
 cla LA; // Line Array
 
-POINT CWedView::p = { 0 }; // current position
+POINT CWedView::p = { 0 };    // current position
 int CWedView::line_n = 0;
 int CWedView::char_w = 0;
 BOOL CWedView::line_changed = 0;
-BOOL CWedView::wed_mode = 1; // 0: edit mode,  1: save mode
+BOOL CWedView::wed_mode = 1;  // 0: edit mode,  1: save mode
+UINT8 CWedView::wed_comb = 0; // key combination check
 HFONT CWedView::m_font=nullptr;
 
 LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -94,7 +95,7 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     // enter
     case 0x0D:
       HideCaret();
-      p.x = 0;  p.y += 1;
+      p.x = 0;  ++p.y;
       if (p.y > line_n)
       {
         line_n = p.y;
@@ -150,7 +151,15 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   default:
   {
     HideCaret();
-    switch (wParam) { case 0x69: wed_mode = 0; break; case 0x68: key_left();break; case 0x6C: key_right(); break; case 0x6B: key_up(); break; case 0x6A: key_down(); break; }
+    switch (wParam) 
+    {
+    // key move
+    case 0x69: wed_mode = 0; break; case 0x68: key_left();break; case 0x6C: key_right(); break; case 0x6B: key_up(); break; case 0x6A: key_down(); break; 
+    // key dd
+    case 0x64: switch (wed_comb) { case 0: wed_comb = 1; break; case 1: key_dd(); break; } break;
+    // key zz
+    case 0x7A: switch (wed_comb) { case 0: wed_comb = 2; break; case 3: key_zz(); break; } break;
+    }
     ShowCaret();
   }
     break;
@@ -192,9 +201,7 @@ void CWedView::key_up()
   if (p.y == 0)           return;
   else if (p.y == first_line)
   {
-    --first_line;
-    --last_line;
-    --p.y;
+    --first_line; --last_line; --p.y;
     clear_screen();
     long  save_pos_x = 0;
     size_t size = LA.size();
@@ -232,9 +239,7 @@ void CWedView::key_down()
   if (p.y == line_n) return;
   else if (p.y == last_line)
   {
-    ++first_line;
-    ++last_line;  
-    ++p.y;
+    ++first_line; ++last_line;  ++p.y;
     clear_screen();
     size_t init_pos = p.y - SCREEN_LINE;
     long  save_pos_x = 0;
@@ -292,6 +297,16 @@ void CWedView::key_left()
   for (auto i = line.begin(); i != line.end(); i++) if (p.x == (*i).x) { char_w = (*i).w; break; }
   p.x -= char_w;  SetCaretPos(p.x, p.y*char_y);
 #endif
+}
+
+void CWedView::key_dd()
+{
+  // vim dd
+}
+
+void CWedView::key_zz()
+{
+  // vim zz
 }
 
 void CWedView::save()

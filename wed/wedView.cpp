@@ -59,7 +59,6 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
   if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
   {
     HideCaret();
-    save();
     // CTRL + o: open,  +s: save,  +b: build, +c: console
     switch (wParam) {case 0x0F: file_work(1, &LA); break; case 0x13: file_work(0, &LA); break; case 0x02: build_work(); break; case 0x03: show_console(); break; }
     return 1;

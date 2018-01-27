@@ -45,12 +45,7 @@ LRESULT CWedView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
   m_font = CreateFont(18, 0, 0, 0, FW_LIGHT, false, false, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,  DEFAULT_QUALITY, DEFAULT_PITCH, 
     L"Dejavu Sans Mono");  //L"Source Sans Pro");
   if (m_font) SetFont(m_font);
-
-  CClientDC pDC(m_hWnd);
-  pDC.SelectFont(m_font);
-  pDC.GetTextMetrics(&m_tm);
-  char_x = m_tm.tmAveCharWidth;
-  char_y = m_tm.tmHeight;
+  CClientDC pDC(m_hWnd);  pDC.SelectFont(m_font);  pDC.GetTextMetrics(&m_tm);  char_x = m_tm.tmAveCharWidth;  char_y = m_tm.tmHeight;
   ::CreateCaret(m_hWnd, (HBITMAP)0, 1, char_y);
   return 0;
 }
@@ -156,9 +151,9 @@ LRESULT CWedView::OnChar(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& 
     // key move
     case 0x69: wed_mode = 0; break; case 0x68: key_left();break; case 0x6C: key_right(); break; case 0x6B: key_up(); break; case 0x6A: key_down(); break; 
     // key dd
-    case 0x64: switch (wed_comb) { case 0: wed_comb = 1; break; case 1: key_dd(); break; } break;
+    case 0x64: switch (wed_comb) { case 0: wed_comb = 1; break; case 1: wed_comb = 0; key_dd(); break; } break;
     // key zz
-    case 0x7A: switch (wed_comb) { case 0: wed_comb = 2; break; case 3: key_zz(); break; } break;
+    case 0x7A: switch (wed_comb) { case 0: wed_comb = 2; break; case 2: wed_comb = 0;  key_zz(); break; } break;
     }
     ShowCaret();
   }
@@ -177,10 +172,7 @@ LRESULT CWedView::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /
 
 void CWedView::drawtext(CH& c, const WPARAM& w, const LPARAM& l)
 {
-  CClientDC pDC(m_hWnd);
-  pDC.SelectFont(m_font);
-  pDC.SetTextColor(FONTCOLOR);
-  pDC.SetBkColor(BACKGROUND);
+  CClientDC pDC(m_hWnd);  pDC.SelectFont(m_font);  pDC.SetTextColor(FONTCOLOR);  pDC.SetBkColor(BACKGROUND);
 
   switch (w)
   {
@@ -302,11 +294,13 @@ void CWedView::key_left()
 void CWedView::key_dd()
 {
   // vim dd
+  printf("key_dd\n");
 }
 
 void CWedView::key_zz()
 {
   // vim zz
+  printf("key_zz\n");
 }
 
 void CWedView::save()

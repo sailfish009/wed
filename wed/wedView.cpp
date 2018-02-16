@@ -305,7 +305,7 @@ void CWedView::key_zz()
 
 void CWedView::save()
 {
-  if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1)))   LA.push_back(line);
+  if ((LA.size() == 0) || (LA.size() < (size_t)(line_n + 1))) { LA.push_back(line); line.clear(); }
   if (line_changed) { line_changed = 0; llt it = n(LA.begin(), p.y); it->swap(line); }
 }
 
